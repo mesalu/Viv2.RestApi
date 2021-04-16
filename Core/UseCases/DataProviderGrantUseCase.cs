@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using Viv2.API.Core.Constants;
 using Viv2.API.Core.Dto;
 using Viv2.API.Core.Dto.Request;
 using Viv2.API.Core.Dto.Response;
@@ -45,11 +46,12 @@ namespace Viv2.API.Core.UseCases
                     Token = _minter.Mint(_claimsComposer.ComposeIdentity(user), TokenType.DaemonAccess),
                     ExpiresAt = (DateTime.UtcNow + TimeSpan.FromSeconds(_minter.Options.RefreshTokenLifespan)),
                     IssuedTo = user.Id,
-                    IssuedBy = Dns.GetHostName()
+                    IssuedBy = Dns.GetHostName(),
+                    AccessCapacity = RoleValues.Bot
                 }
             };
-            
-            // TODO: insert refresh token into user store.
+            user.RefreshTokens.Add(response.RefreshToken);
+            await _userStore.UpdateUser(user);
             
             // signal success
             outputPort.Handle(response);

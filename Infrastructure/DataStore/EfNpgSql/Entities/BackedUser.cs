@@ -27,8 +27,18 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
                 Pets = this.Pets,
                 Environments = this.Environments,
                 Id = Guid.Parse(this.Id),
-                Name = this.UserName
+                Name = this.UserName,
             };
+        }
+
+        public void ApplyCoreUser(User user)
+        {
+            // Potentially lossy, for now trust that `user` is the source of truth.
+            RefreshTokens = user.RefreshTokens;
+            Pets = user.Pets;
+            Environments = user.Environments;
+            Id = user.Id.ToString();
+            UserName = user.Name;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Viv2.API.Core.Constants;
 using Viv2.API.Core.Dto;
 using Viv2.API.Core.Dto.Request;
 using Viv2.API.Core.Dto.Response;
@@ -31,24 +32,27 @@ namespace Viv2.API.Core.UseCases
             var user = await _backingStore.GetUserById(Guid.Parse(message.UserId));
             
             // Verify refresh token specified by message is associated to user.
-            bool associatedToUser = 
-                user.RefreshTokens.Select(u => u.Token).Contains(message.EncodedRefreshToken);
+            var persistedToken = user.RefreshTokens
+                .FirstOrDefault(rt => rt.Token == message.EncodedRefreshToken);
 
-            if (!associatedToUser) return false;
+            if (persistedToken == null) return false;
             
-            // TODO: load claims out of old token, to distinguish prior claims? That way this can be used for all refreshes
-            
-            // Mint a new access token.
-            var mintedAccessToken = _minter.Mint(
-                _claimsComposer.ComposeIdentity(user),
-                TokenType.UserAccess);
+            // Mint a new access token based on the access capacity specified by the refresh token.
+            string mintedAccessToken;
+            if (persistedToken.AccessCapacity == RoleValues.User)
+                mintedAccessToken = _minter.Mint(_claimsComposer.ComposeIdentity(user), TokenType.UserAccess);
+            else if (persistedToken.AccessCapacity == RoleValues.Bot)
+                mintedAccessToken = _minter.Mint(_claimsComposer.ComposeIdentity(user), TokenType.DaemonAccess);
+            else
+            {
+                // Malformed?
+                return false;
+            }
             
             // if a new refresh token is needed, mint a new one.
             var mintedRefreshToken = message.EncodedRefreshToken;
             
-            
             // compose and submit response.
-            var identity = _claimsComposer.ComposeIdentity(user);
             LoginResponse response = new LoginResponse
             {
                 AccessToken = new AccessToken

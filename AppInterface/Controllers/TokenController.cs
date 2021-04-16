@@ -6,6 +6,7 @@ using Viv2.API.AppInterface.Constants;
 using Viv2.API.AppInterface.Ports;
 using Viv2.API.Core.Constants;
 using Viv2.API.Core.Dto.Request;
+using Viv2.API.Core.Dto.Response;
 using Viv2.API.Core.Interfaces.UseCases;
 
 namespace Viv2.API.AppInterface.Controllers
@@ -33,7 +34,7 @@ namespace Viv2.API.AppInterface.Controllers
         [Authorize(Roles = RoleValues.User)]
         public async Task<IActionResult> AcquireTokenForDaemon()
         {
-            LoginAttemptPort port = new LoginAttemptPort();
+            BasicPresenter<LoginResponse> port = new BasicPresenter<LoginResponse>();
             ProviderGrantRequest request = new ProviderGrantRequest
             {
                 OnBehalfOf = Helpers.UserCompatHelper.UserGuidFromAuthenticatedContext(HttpContext)
@@ -43,7 +44,7 @@ namespace Viv2.API.AppInterface.Controllers
             return (success) ?  new OkObjectResult(port.Response) : BadRequest();
         }
 
-        [HttpPost("daemon-refresh")]
+        [HttpPost("refresh")]
         [Authorize(Roles = RoleValues.Bot)]
         public async Task<IActionResult> RefreshForDaemon([NotNull] string userId, [NotNull] string encodedToken)
         {
@@ -53,7 +54,7 @@ namespace Viv2.API.AppInterface.Controllers
             };
 
             // submit a request to Core:
-            LoginAttemptPort port = new LoginAttemptPort();
+            BasicPresenter<LoginResponse> port = new BasicPresenter<LoginResponse>();
 
             var success = await _refreshTokenExchange.Handle(request, port);
             return (success) ? new OkObjectResult(port.Response) : BadRequest();

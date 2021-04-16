@@ -16,9 +16,30 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
             _userManager = userManager;
         }
         
-        public async Task<User> GetUserByName(string name) => (await _userManager.FindByNameAsync(name)).ToCoreUser();
+        public async Task<User> GetUserByName(string name) => (await _userManager.FindByNameAsync(name))?.ToCoreUser();
 
-        public async Task<User> GetUserById(Guid id) => (await _userManager.FindByIdAsync(id.ToString())).ToCoreUser();
+        public async Task<User> GetUserById(Guid id) => (await _userManager.FindByIdAsync(id.ToString()))?.ToCoreUser();
+
+        public async Task<Guid> CreateUser(User user, string password)
+        {
+            BackedUser backableUser = new BackedUser();
+            backableUser.ApplyCoreUser(user);
+            
+            try
+            {
+                IdentityResult result = await _userManager.CreateAsync(backableUser, password);
+                if (result.Succeeded)
+                {
+                    return Guid.Parse(backableUser.Id);
+                }
+            }
+            catch (Exception)
+            {
+                throw new Core.Exceptions.UserStoreException("Failed to create new user");
+            }
+
+            return Guid.Empty;
+        }
 
         public async Task<bool> CheckPassword(User user, string password)
         {
@@ -38,7 +59,9 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
 
         public async Task UpdateUser(User user)
         {
-            throw new System.NotImplementedException();
+            var backedUser = await _userManager.FindByIdAsync(user.Id.ToString());
+            backedUser.ApplyCoreUser(user);
+            await _userManager.UpdateAsync(backedUser);
         }
     }
 }

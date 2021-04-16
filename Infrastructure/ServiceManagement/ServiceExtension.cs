@@ -24,8 +24,7 @@ namespace Viv2.API.Infrastructure.ServiceManagement
         /// </summary>
         /// <param name="services"></param>
         /// <param name="type"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        public static void AddTokenMinter(this IServiceCollection services, TokenMinterTypes type, IConfiguration configuration)
+        public static void AddTokenAuth(this IServiceCollection services, TokenMinterTypes type, IConfiguration configuration)
         {
             switch (type)
             {
@@ -49,7 +48,6 @@ namespace Viv2.API.Infrastructure.ServiceManagement
         /// <param name="type"></param>
         /// <param name="configuration">A handle on the application configuration, where information for
         /// the pertinent data backing policy can be found (such as connection strings)</param>
-        /// <exception cref="NotImplementedException"></exception>
         public static void AddDataStore(this IServiceCollection services, BackingStoreTypes type, IConfiguration configuration)
         {
             if (type != BackingStoreTypes.EfIdent) throw new NotImplementedException();
@@ -64,16 +62,16 @@ namespace Viv2.API.Infrastructure.ServiceManagement
             services.AddScoped<IUserBackingStore, UserBackingStore>();
             services.AddScoped<IPetBackingStore, PetBackingStore>();
 
-            IdentityBuilder builder = services.AddIdentityCore<BackedUser>(o =>
+            services.Configure<IdentityOptions>(options =>
             {
-                // configure identity options
-                o.Password.RequireDigit = true;
-                o.Password.RequireLowercase = false;
-                o.Password.RequireUppercase = true;
-                o.Password.RequireNonAlphanumeric = false;
-                o.Password.RequiredLength = 6;
-            })
-                .AddEntityFrameworkStores<DataContext>();
+                // Password settings.
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = true;
+
+                options.User.RequireUniqueEmail = true;
+            });
 
             services.AddIdentity<BackedUser, IdentityRole>()
                 .AddEntityFrameworkStores<DataContext>();

@@ -9,5 +9,12 @@ namespace Viv2.API.Infrastructure.DataStore
         /// </summary>
         /// <returns></returns>
         User ToCoreUser();
+
+        /// <summary>
+        /// Takes the values contained in User and applies it to the IBackedUser instance.
+        /// Can be treated as a sort of inverse operation for `ToCoreUser`.
+        /// </summary>
+        /// <param name="user"></param>
+        void ApplyCoreUser(User user);
     }
 }

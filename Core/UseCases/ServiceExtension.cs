@@ -10,6 +10,7 @@ namespace Viv2.API.Core.UseCases
             services.AddTransient<IDataProviderGrantUseCase, DataProviderGrantUseCase>();
             services.AddTransient<ILoginUseCase, LoginUseCase>();
             services.AddTransient<IRefreshTokenExchangeUseCase, RefreshTokenExchangeUseCase>();
+            services.AddTransient<IAddUserUseCase, AddUserUseCase>();
         }
     }
 }

@@ -34,5 +34,11 @@ namespace Viv2.API.Core.Entities
         /// </summary>
         /// <returns></returns>
         public DateTime ExpiresAt { get; init; }
+        
+        /// <summary>
+        /// Specifies which access level is associated to this refresh token, be it user or bot/daemon.
+        /// </summary>
+        public string AccessCapacity { get; init; }
+        
     }
 }

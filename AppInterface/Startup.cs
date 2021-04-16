@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Viv2.API.Core.UseCases;
 using Viv2.API.Infrastructure.ServiceManagement;
+using Viv2.API.AppInterface.Logging;
 
 namespace Viv2.API.AppInterface
 {
@@ -26,8 +27,8 @@ namespace Viv2.API.AppInterface
             
             // Apply Core use cases.
             services.ApplyUseCases();
-            services.AddTokenMinter(TokenMinterTypes.JWS, Configuration);
             services.AddDataStore(BackingStoreTypes.EfIdent, Configuration);
+            services.AddTokenAuth(TokenMinterTypes.JWS, Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -38,10 +39,12 @@ namespace Viv2.API.AppInterface
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseRequestLogging();
+            //app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

@@ -3,6 +3,15 @@ using Microsoft.EntityFrameworkCore;
 using Viv2.API.Core.Entities;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities;
 
+/*
+ * Design-time notes:
+ * - DataContextDesignFactory exists for use with `dotnet ef` toolsets.
+ * - The migrations directory does not match the default case, use '-o', '--output-dir' to specify
+ *      the correct path
+ * - As specified by DataContextDesignFactory, use the named environment variable to make invoking the dotnet ef tools
+ *      simpler.
+ */
+
 namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts
 {
     public partial class DataContext : IdentityDbContext<BackedUser>
