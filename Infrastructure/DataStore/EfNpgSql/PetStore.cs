@@ -2,7 +2,7 @@
 
 namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
 {
-    public class PetBackingStore : IPetBackingStore
+    public class PetStore : IPetBackingStore
     {
         
     }

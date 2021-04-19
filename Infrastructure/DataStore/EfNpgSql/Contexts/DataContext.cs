@@ -17,6 +17,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts
     public partial class DataContext : IdentityDbContext<BackedUser>
     {
         public virtual DbSet<Controller> Controllers { get; set; }
+        public virtual DbSet<Environment> Environments { get; set; }
         public virtual DbSet<EnvDataSample> EnvDataSamples { get; set; }
         public virtual DbSet<Pet> Pets { get; set; }
         public virtual DbSet<Species> Species { get; set; }

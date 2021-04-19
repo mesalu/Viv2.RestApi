@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Viv2.API.AppInterface.Constants;
 using Viv2.API.AppInterface.Ports;
 using Viv2.API.Core.Constants;
@@ -16,11 +17,12 @@ namespace Viv2.API.AppInterface.Controllers
     public class UserManagementController : ControllerBase
     {
         private readonly IAddUserUseCase _addUser;
+        private readonly IModifyUserRolesUseCase _modifyUserRoles;
 
-        public UserManagementController(IAddUserUseCase addUserUseCase)
+        public UserManagementController(IAddUserUseCase addUserUseCase, IModifyUserRolesUseCase modifyUserRoles)
         {
             _addUser = addUserUseCase;
-            Console.WriteLine("This controller is instanced.");
+            _modifyUserRoles = modifyUserRoles;
         }
 
         [Authorize(Roles = RoleValues.Admin)]
@@ -39,8 +41,25 @@ namespace Viv2.API.AppInterface.Controllers
         }
         
         [Authorize(Roles = RoleValues.Admin)]
-        [HttpPost("promote")]
-        public async Task<IActionResult> BumpToAdmin([FromBody] Guid userGuid)
+        [HttpPost("promote/{userGuid}")]
+        public async Task<IActionResult> BumpToAdmin(Guid userGuid)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            
+            var request = new ModifyUserRolesRequest
+            {
+                UserId = userGuid,
+                Mode = ModifyUserRolesRequest.ModificationMode.Add,
+                DesiredRoles = new[] {RoleValues.Admin}
+            };
+
+            var success = await _modifyUserRoles.Handle(request, new BasicPresenter<BlankResponse>());
+            return (success) ? Ok() : BadRequest();
+        }
+
+        [Authorize(Roles = RoleValues.Admin)]
+        [HttpPost("freeze/{userGuid}")]
+        public async Task<IActionResult> FreezeAccount(Guid userGuid)
         {
             return await Task.FromResult<IActionResult>(BadRequest("Not yet implemented"));
         }

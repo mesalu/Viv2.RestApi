@@ -8,7 +8,7 @@ using Viv2.API.Core.ConfigModel;
 using Viv2.API.Core.Constants;
 using Viv2.API.Core.Services;
 
-namespace Viv2.API.Infrastructure.JwsMinting
+namespace Viv2.API.Infrastructure.JwtMinting.Jws
 {
     /// <summary>
     /// Implementation of ITokenMinter using signed JWT standards
@@ -23,6 +23,7 @@ namespace Viv2.API.Infrastructure.JwsMinting
     {
         private readonly SecurityKey _securityKey;
         private readonly SigningCredentials _signingCredentials;
+        
         public JwsMinter(MinterOptions options)
         {
             Options = options;
@@ -30,22 +31,26 @@ namespace Viv2.API.Infrastructure.JwsMinting
             _signingCredentials = new SigningCredentials(_securityKey, SecurityAlgorithms.HmacSha256);
         }
 
-        public TokenValidationParameters ValidationParameters => new TokenValidationParameters
+        public TokenValidationParameters ValidationParameters => new ()
         {
             ValidateIssuer = true,
             ValidateIssuerSigningKey = true,
             ValidateLifetime = true,
+            ValidateAudience = false, // currently not a clean, well-cached way of doing so.
             RequireExpirationTime = true,
-            RequireAudience = false,
+            RequireAudience = true,
             RequireSignedTokens = true,
             IssuerSigningKey = _securityKey,
-            ValidIssuer = Options.Issuer
+            ValidIssuer = Options.Issuer,
         };
         
         public string Mint(ClaimsIdentity identity, TokenType type)
         {
             if (type == TokenType.Refresh) return _MintRefreshToken();
-            
+
+            var idClaimValue = identity.FindFirst(c => c.Type == ClaimNames.UserId)?.Value;
+            if (idClaimValue == null) throw new Exception("Malformed input identity");
+
             // There's probably a better method for this, but DateTime.ToBinary is kinda vague about the return value's
             // 'anchor' point.
             var utcNow = (long) Math.Round((DateTime.UtcNow - DateTime.UnixEpoch).TotalSeconds);
@@ -57,24 +62,30 @@ namespace Viv2.API.Infrastructure.JwsMinting
                 // Jwt Issued-At
                 new Claim(JwtRegisteredClaimNames.Iat, utcNow.ToString(), ClaimValueTypes.Integer64),
 
-                // User Id
-                identity.FindFirst(c => c.Type == ClaimNames.UserId)
+                // User Id (Use audience for JWT tokens)
+                new Claim(JwtRegisteredClaimNames.Aud, idClaimValue)
             });
-
-            // Add roles as per `type`:
+            
+            // add any role claims that are present in the identity already.
+            claims.AddRange(identity.FindAll(c => c.Type == ClaimTypes.Role));
+            
+            // Add access type as per `type`:
             switch (type)
             {
                 case TokenType.UserAccess:
-                    claims.Add(new Claim(ClaimTypes.Role, RoleValues.User));
+                    claims.Add(new Claim(ClaimNames.AccessType, AccessLevelValues.User));
                     break;
                 case TokenType.DaemonAccess:
-                    claims.Add(new Claim(ClaimTypes.Role, RoleValues.Bot));
+                    claims.Add(new Claim(ClaimNames.AccessType, AccessLevelValues.Daemon));
                     break;
+                case TokenType.Refresh:
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
 
             // Build a JWT out of the claims.
             JwtSecurityToken jwt = new JwtSecurityToken(
-                issuer: Options.Issuer,
+                Options.Issuer,
                 claims: claims,
                 notBefore: DateTime.UtcNow,
                 expires: DateTime.UtcNow.Add(TimeSpan.FromSeconds(Options.RefreshTokenLifespan)),

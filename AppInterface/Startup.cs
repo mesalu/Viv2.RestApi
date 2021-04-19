@@ -24,9 +24,11 @@ namespace Viv2.API.AppInterface
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            
-            // Apply Core use cases.
+
+            // Apply Core's default use cases.
             services.ApplyUseCases();
+            
+            // Add supporting services.
             services.AddDataStore(BackingStoreTypes.EfIdent, Configuration);
             services.AddTokenAuth(TokenMinterTypes.JWS, Configuration);
         }
@@ -40,8 +42,10 @@ namespace Viv2.API.AppInterface
             }
 
             app.UseRequestLogging();
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
+
             app.UseRouting();
+
             app.UseAuthentication();
             app.UseAuthorization();
 

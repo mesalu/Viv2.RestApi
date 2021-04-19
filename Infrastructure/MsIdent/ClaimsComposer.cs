@@ -1,4 +1,6 @@
-﻿using System.Security.Claims;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Security.Principal;
 using Viv2.API.Core.Entities;
 using Viv2.API.Core.Services;
@@ -11,14 +13,12 @@ namespace Viv2.API.Infrastructure.MsIdent
     /// </summary>
     public class ClaimsComposer : IClaimsComposer
     {
-        public ClaimsIdentity ComposeIdentity(User user)
+        public ClaimsIdentity ComposeIdentity(User user, IEnumerable<Claim> extras = null)
         {
-            return new (
-                new GenericIdentity(user.Name),
-                new[]
-                {
-                    new Claim(ClaimNames.UserId, user.Id.ToString()),
-                });
+            var claims = (extras == null) ? new List<Claim>() : extras.ToList();
+            claims.Add(new Claim(ClaimNames.UserId, user.Id.ToString()));
+            
+            return new ClaimsIdentity(new GenericIdentity(user.Name), claims);
         }
     }
 }

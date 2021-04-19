@@ -17,6 +17,7 @@ namespace Viv2.API.Core.Entities
         }
         
         public string Name { get; set; }
+        public string Email { get; set; }
         public Guid Id { get; set; }
 
         public virtual ICollection<RefreshToken> RefreshTokens { get; set; }

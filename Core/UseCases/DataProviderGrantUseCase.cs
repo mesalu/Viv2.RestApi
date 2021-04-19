@@ -47,7 +47,7 @@ namespace Viv2.API.Core.UseCases
                     ExpiresAt = (DateTime.UtcNow + TimeSpan.FromSeconds(_minter.Options.RefreshTokenLifespan)),
                     IssuedTo = user.Id,
                     IssuedBy = Dns.GetHostName(),
-                    AccessCapacity = RoleValues.Bot
+                    AccessCapacity = AccessLevelValues.Daemon
                 }
             };
             user.RefreshTokens.Add(response.RefreshToken);

@@ -39,9 +39,9 @@ namespace Viv2.API.Core.UseCases
             
             // Mint a new access token based on the access capacity specified by the refresh token.
             string mintedAccessToken;
-            if (persistedToken.AccessCapacity == RoleValues.User)
+            if (persistedToken.AccessCapacity == AccessLevelValues.User)
                 mintedAccessToken = _minter.Mint(_claimsComposer.ComposeIdentity(user), TokenType.UserAccess);
-            else if (persistedToken.AccessCapacity == RoleValues.Bot)
+            else if (persistedToken.AccessCapacity == AccessLevelValues.Daemon)
                 mintedAccessToken = _minter.Mint(_claimsComposer.ComposeIdentity(user), TokenType.DaemonAccess);
             else
             {

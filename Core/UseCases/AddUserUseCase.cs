@@ -27,6 +27,7 @@ namespace Viv2.API.Core.UseCases
             User user = new User
             {
                 Name = message.UserName,
+                Email = message.Email
             };
 
             var guid = await _userBackingStore.CreateUser(user, message.Password);

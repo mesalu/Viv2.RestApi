@@ -21,13 +21,14 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
 
         public User ToCoreUser()
         {
-            return new User
+            return new()
             {
-                RefreshTokens = this.RefreshTokens,
-                Pets = this.Pets,
-                Environments = this.Environments,
-                Id = Guid.Parse(this.Id),
-                Name = this.UserName,
+                RefreshTokens = RefreshTokens,
+                Pets = Pets,
+                Environments = Environments,
+                Id = Guid.Parse(Id),
+                Name = UserName,
+                Email = Email
             };
         }
 
@@ -37,8 +38,16 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
             RefreshTokens = user.RefreshTokens;
             Pets = user.Pets;
             Environments = user.Environments;
-            Id = user.Id.ToString();
+            Id = (user.Id == Guid.Empty) ? null : user.Id.ToString();
             UserName = user.Name;
+            Email = user.Email;
+        }
+
+        public static BackedUser From(User user)
+        {
+            var instance = new BackedUser();
+            instance.ApplyCoreUser(user);
+            return instance;
         }
     }
 }

@@ -32,24 +32,8 @@ namespace Viv2.API.AppInterface.Controllers
                 return BadRequest(ModelState);
 
             BasicPresenter<LoginResponse> port = new BasicPresenter<LoginResponse>();
-            Console.WriteLine($"Username: {request.Username}");
             var success = await _loginUseCase.Handle(request, port);
 
-            return (success) ? new OkObjectResult(port.Response) : BadRequest();
-        }
-
-        [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh([FromBody] string userId, string refreshToken)
-        {
-            TokenExchangeRequest request = new TokenExchangeRequest
-            {
-                EncodedRefreshToken = refreshToken, UserId = userId
-            };
-
-            // submit a request to Core:
-            BasicPresenter<LoginResponse> port = new BasicPresenter<LoginResponse>();
-
-            var success = await _refreshTokenExchange.Handle(request, port);
             return (success) ? new OkObjectResult(port.Response) : BadRequest();
         }
     }

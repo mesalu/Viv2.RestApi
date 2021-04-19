@@ -7,10 +7,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Viv2.API.Core.ConfigModel;
 using Viv2.API.Core.Services;
+using Viv2.API.Core.Constants;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities;
-using Viv2.API.Infrastructure.JwsMinting;
+using Viv2.API.Infrastructure.JwtMinting;
+using Viv2.API.Infrastructure.JwtMinting.Jws;
 
 namespace Viv2.API.Infrastructure.ServiceManagement
 {
@@ -33,7 +35,7 @@ namespace Viv2.API.Infrastructure.ServiceManagement
                     configuration.Bind("MinterOptions", options);
                     JwsMinter minter = new JwsMinter(options);
                     services.AddSingleton<ITokenMinter>(minter);
-                    _ConfigureForJwtAuth(services, configuration, minter.ValidationParameters);
+                    _ConfigureForJwtAuth(services, configuration, minter.ValidationParameters, options);
                     break;
                 case TokenMinterTypes.JWE:
                 case TokenMinterTypes.PaSeTo:
@@ -59,38 +61,60 @@ namespace Viv2.API.Infrastructure.ServiceManagement
             services.AddDbContext<DataContext>(options => 
                 options.UseNpgsql(configuration.GetConnectionString("DataContextConnectionString")));
 
-            services.AddScoped<IUserBackingStore, UserBackingStore>();
-            services.AddScoped<IPetBackingStore, PetBackingStore>();
+            services.AddScoped<IUserBackingStore, UserStore>();
+            services.AddScoped<IPetBackingStore, PetStore>();
+            services.AddScoped<IEnvironmentBackingStore, EnvironmentStore>();
 
-            services.Configure<IdentityOptions>(options =>
-            {
-                // Password settings.
-                options.Password.RequireDigit = true;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = true;
+            services.AddIdentity<BackedUser, IdentityRole>(options =>
+                {
+                    // Password settings.
+                    options.Password.RequireDigit = true;
+                    options.Password.RequireLowercase = false;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireUppercase = true;
 
-                options.User.RequireUniqueEmail = true;
-            });
-
-            services.AddIdentity<BackedUser, IdentityRole>()
+                    options.User.RequireUniqueEmail = true;
+                })
                 .AddEntityFrameworkStores<DataContext>();
         }
 
         private static void _ConfigureForJwtAuth(IServiceCollection services, 
             IConfiguration configuration,
-            TokenValidationParameters tokenValidationParameters)
+            TokenValidationParameters tokenValidationParameters,
+            MinterOptions minterOptions)
         { 
+            // Add the JWT-speicific ClaimsIdentityCompat to services:
+            services.AddTransient<IClaimIdentityCompat, ClaimsIdentityCompat>();
+            
+            // Add authentication framework
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                //options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(configureOptions =>
             {
-                configureOptions.ClaimsIssuer = tokenValidationParameters.ValidIssuer;
+                configureOptions.ClaimsIssuer = minterOptions.Issuer;
                 configureOptions.TokenValidationParameters = tokenValidationParameters;
                 configureOptions.SaveToken = false;
+            });
+            
+            // Add claim-based authorization policies. (Done here as we know that we'll be claim-based
+            //  as we're configuring for JWTs)
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(
+                    PolicyNames.UserAccess, 
+                    policy =>
+                    {
+                        policy.RequireClaim(ClaimNames.AccessType, AccessLevelValues.User);
+                    });
+                options.AddPolicy(
+                    PolicyNames.DaemonAccess,
+                    policy =>
+                    {
+                        policy.RequireClaim(ClaimNames.AccessType, AccessLevelValues.Daemon);
+                    });
             });
         }
     }

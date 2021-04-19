@@ -8,6 +8,7 @@ using Viv2.API.Core.Constants;
 using Viv2.API.Core.Dto.Request;
 using Viv2.API.Core.Dto.Response;
 using Viv2.API.Core.Interfaces.UseCases;
+using Viv2.API.Core.Services;
 
 namespace Viv2.API.AppInterface.Controllers
 {
@@ -17,35 +18,44 @@ namespace Viv2.API.AppInterface.Controllers
     {
         private readonly IDataProviderGrantUseCase _dataProviderGrant;
         private readonly IRefreshTokenExchangeUseCase _refreshTokenExchange;
+        private readonly IClaimIdentityCompat _claimCompat;
         
         public TokenController(IDataProviderGrantUseCase dataProviderGrant,
-            IRefreshTokenExchangeUseCase refreshTokenExchange)
+            IRefreshTokenExchangeUseCase refreshTokenExchange,
+            IClaimIdentityCompat claimsCompat)
         {
             _dataProviderGrant = dataProviderGrant;
             _refreshTokenExchange = refreshTokenExchange;
+            _claimCompat = claimsCompat;
         }
 
         /// <summary>
         /// For an authenticated user, generates and provides a token set for a daemon process that has
-        /// recieved permission from the user to provide data on their behalf.
+        /// received permission from the user to provide data on their behalf.
         /// </summary>
         /// <returns></returns>
-        [HttpPost("grant")]
-        [Authorize(Roles = RoleValues.User)]
+        [Authorize(Policy = PolicyNames.UserAccess)]
+        [HttpGet("grant")]
         public async Task<IActionResult> AcquireTokenForDaemon()
         {
             BasicPresenter<LoginResponse> port = new BasicPresenter<LoginResponse>();
             ProviderGrantRequest request = new ProviderGrantRequest
             {
-                OnBehalfOf = Helpers.UserCompatHelper.UserGuidFromAuthenticatedContext(HttpContext)
+                OnBehalfOf = _claimCompat.ExtractFirstIdClaim(HttpContext.User) 
             };
             
             var success = await _dataProviderGrant.Handle(request, port);
             return (success) ?  new OkObjectResult(port.Response) : BadRequest();
         }
 
+        /// <summary>
+        /// Used for enacting a refresh token exchange.
+        /// Can be used by either Client UIs representing an actual user or daemon bots.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="encodedToken"></param>
+        /// <returns></returns>
         [HttpPost("refresh")]
-        [Authorize(Roles = RoleValues.Bot)]
         public async Task<IActionResult> RefreshForDaemon([NotNull] string userId, [NotNull] string encodedToken)
         {
             TokenExchangeRequest request = new TokenExchangeRequest
