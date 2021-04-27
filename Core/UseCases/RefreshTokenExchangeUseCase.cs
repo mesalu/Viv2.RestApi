@@ -6,9 +6,9 @@ using Viv2.API.Core.Constants;
 using Viv2.API.Core.Dto;
 using Viv2.API.Core.Dto.Request;
 using Viv2.API.Core.Dto.Response;
-using Viv2.API.Core.Entities;
 using Viv2.API.Core.Interfaces;
 using Viv2.API.Core.Interfaces.UseCases;
+using Viv2.API.Core.ProtoEntities;
 using Viv2.API.Core.Services;
 
 namespace Viv2.API.Core.UseCases
@@ -30,10 +30,11 @@ namespace Viv2.API.Core.UseCases
         {
             // Verify user exists.
             var user = await _backingStore.GetUserById(Guid.Parse(message.UserId));
+            await _backingStore.LoadRefreshTokens(user);
             
             // Verify refresh token specified by message is associated to user.
             var persistedToken = user.RefreshTokens
-                .FirstOrDefault(rt => rt.Token == message.EncodedRefreshToken);
+                .FirstOrDefault(rt => String.Compare(rt.Token, message.EncodedRefreshToken, StringComparison.Ordinal) == 0);
 
             if (persistedToken == null) return false;
             
@@ -64,7 +65,7 @@ namespace Viv2.API.Core.UseCases
                 {
                     Token = mintedRefreshToken,
                     ExpiresAt = (DateTime.UtcNow + TimeSpan.FromSeconds(_minter.Options.RefreshTokenLifespan)),
-                    IssuedTo = user.Id,
+                    IssuedTo = user.Guid,
                     IssuedBy = Dns.GetHostName()
                 }
             };

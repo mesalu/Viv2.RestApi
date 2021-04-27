@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
 {
-    public partial class Init : Migration
+    public partial class EF_Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -27,6 +27,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -48,14 +49,14 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Controllers",
+                name: "Controller",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Controllers", x => x.Id);
+                    table.PrimaryKey("PK_Controller", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -69,18 +70,6 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Species", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "User",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_User", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -190,42 +179,6 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Pets",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    SpeciesId = table.Column<int>(type: "integer", nullable: true),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    Morph = table.Column<string>(type: "text", nullable: true),
-                    HatchDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
-                    BackedUserId = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Pets", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Pets_AspNetUsers_BackedUserId",
-                        column: x => x.BackedUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Pets_Species_SpeciesId",
-                        column: x => x.SpeciesId,
-                        principalTable: "Species",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Pets_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "RefreshToken",
                 columns: table => new
                 {
@@ -234,55 +187,70 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
                     IssuedTo = table.Column<Guid>(type: "uuid", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     AccessCapacity = table.Column<string>(type: "text", nullable: true),
-                    BackedUserId = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: true)
+                    UserId = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_RefreshToken", x => x.Token);
                     table.ForeignKey(
-                        name: "FK_RefreshToken_AspNetUsers_BackedUserId",
-                        column: x => x.BackedUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_RefreshToken_User_UserId",
+                        name: "FK_RefreshToken_AspNetUsers_UserId",
                         column: x => x.UserId,
-                        principalTable: "User",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Environment",
+                name: "Pets",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ControllerId = table.Column<Guid>(type: "uuid", nullable: true),
-                    InhabitantId = table.Column<int>(type: "integer", nullable: true),
-                    Model = table.Column<string>(type: "text", nullable: true),
-                    Descr = table.Column<string>(type: "text", nullable: true),
-                    BackedUserId = table.Column<string>(type: "text", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    RealSpeciesId = table.Column<int>(type: "integer", nullable: true),
+                    Name = table.Column<string>(type: "text", nullable: true),
+                    Morph = table.Column<string>(type: "text", nullable: true),
+                    HatchDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    UserId = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Environment", x => x.Id);
+                    table.PrimaryKey("PK_Pets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Environment_AspNetUsers_BackedUserId",
-                        column: x => x.BackedUserId,
+                        name: "FK_Pets_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Environment_Controllers_ControllerId",
+                        name: "FK_Pets_Species_RealSpeciesId",
+                        column: x => x.RealSpeciesId,
+                        principalTable: "Species",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Environments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    RealInhabitantId = table.Column<int>(type: "integer", nullable: true),
+                    Model = table.Column<string>(type: "text", nullable: true),
+                    Descr = table.Column<string>(type: "text", nullable: true),
+                    ControllerId = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Environments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Environments_Controller_ControllerId",
                         column: x => x.ControllerId,
-                        principalTable: "Controllers",
+                        principalTable: "Controller",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Environment_Pets_InhabitantId",
-                        column: x => x.InhabitantId,
+                        name: "FK_Environments_Pets_RealInhabitantId",
+                        column: x => x.RealInhabitantId,
                         principalTable: "Pets",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -294,21 +262,28 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    EnvironmentId = table.Column<Guid>(type: "uuid", nullable: true),
+                    RealEnvironmentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RealOccupantId = table.Column<int>(type: "integer", nullable: true),
                     Captured = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValueSql: "(NOW() AT TIME ZONE 'utc')"),
-                    HotGlass = table.Column<double>(type: "double precision", nullable: true),
-                    HotMat = table.Column<double>(type: "double precision", nullable: true),
-                    MidGlass = table.Column<double>(type: "double precision", nullable: true),
-                    ColdGlass = table.Column<double>(type: "double precision", nullable: true),
-                    ColdMat = table.Column<double>(type: "double precision", nullable: true)
+                    HotGlass = table.Column<double>(type: "double precision", nullable: false),
+                    HotMat = table.Column<double>(type: "double precision", nullable: false),
+                    MidGlass = table.Column<double>(type: "double precision", nullable: false),
+                    ColdGlass = table.Column<double>(type: "double precision", nullable: false),
+                    ColdMat = table.Column<double>(type: "double precision", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EnvDataSamples", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EnvDataSamples_Environment_EnvironmentId",
-                        column: x => x.EnvironmentId,
-                        principalTable: "Environment",
+                        name: "FK_EnvDataSamples_Environments_RealEnvironmentId",
+                        column: x => x.RealEnvironmentId,
+                        principalTable: "Environments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EnvDataSamples_Pets_RealOccupantId",
+                        column: x => x.RealOccupantId,
+                        principalTable: "Pets",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -317,22 +292,22 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
                 name: "EnvironmentUser",
                 columns: table => new
                 {
-                    EnvironmentsId = table.Column<Guid>(type: "uuid", nullable: false),
-                    UsersId = table.Column<Guid>(type: "uuid", nullable: false)
+                    BackedEnvironmentsId = table.Column<Guid>(type: "uuid", nullable: false),
+                    BackedUsersId = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EnvironmentUser", x => new { x.EnvironmentsId, x.UsersId });
+                    table.PrimaryKey("PK_EnvironmentUser", x => new { x.BackedEnvironmentsId, x.BackedUsersId });
                     table.ForeignKey(
-                        name: "FK_EnvironmentUser_Environment_EnvironmentsId",
-                        column: x => x.EnvironmentsId,
-                        principalTable: "Environment",
+                        name: "FK_EnvironmentUser_AspNetUsers_BackedUsersId",
+                        column: x => x.BackedUsersId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_EnvironmentUser_User_UsersId",
-                        column: x => x.UsersId,
-                        principalTable: "User",
+                        name: "FK_EnvironmentUser_Environments_BackedEnvironmentsId",
+                        column: x => x.BackedEnvironmentsId,
+                        principalTable: "Environments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -375,49 +350,39 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_EnvDataSamples_EnvironmentId",
+                name: "IX_EnvDataSamples_RealEnvironmentId",
                 table: "EnvDataSamples",
-                column: "EnvironmentId");
+                column: "RealEnvironmentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Environment_BackedUserId",
-                table: "Environment",
-                column: "BackedUserId");
+                name: "IX_EnvDataSamples_RealOccupantId",
+                table: "EnvDataSamples",
+                column: "RealOccupantId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Environment_ControllerId",
-                table: "Environment",
+                name: "IX_Environments_ControllerId",
+                table: "Environments",
                 column: "ControllerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Environment_InhabitantId",
-                table: "Environment",
-                column: "InhabitantId");
+                name: "IX_Environments_RealInhabitantId",
+                table: "Environments",
+                column: "RealInhabitantId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EnvironmentUser_UsersId",
+                name: "IX_EnvironmentUser_BackedUsersId",
                 table: "EnvironmentUser",
-                column: "UsersId");
+                column: "BackedUsersId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Pets_BackedUserId",
+                name: "IX_Pets_RealSpeciesId",
                 table: "Pets",
-                column: "BackedUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Pets_SpeciesId",
-                table: "Pets",
-                column: "SpeciesId");
+                column: "RealSpeciesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Pets_UserId",
                 table: "Pets",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RefreshToken_BackedUserId",
-                table: "RefreshToken",
-                column: "BackedUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RefreshToken_UserId",
@@ -455,10 +420,10 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Environment");
+                name: "Environments");
 
             migrationBuilder.DropTable(
-                name: "Controllers");
+                name: "Controller");
 
             migrationBuilder.DropTable(
                 name: "Pets");
@@ -468,9 +433,6 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
 
             migrationBuilder.DropTable(
                 name: "Species");
-
-            migrationBuilder.DropTable(
-                name: "User");
         }
     }
 }

@@ -1,4 +1,4 @@
-using Viv2.API.Core.Entities;
+using Viv2.API.Core.ProtoEntities;
 
 namespace Viv2.API.Core.Dto.Response
 {

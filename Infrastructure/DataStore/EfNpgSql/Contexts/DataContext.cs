@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Viv2.API.Core.Entities;
+using Viv2.API.Core.ProtoEntities;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities;
 
 /*
@@ -14,9 +14,9 @@ using Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities;
 
 namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts
 {
-    public partial class DataContext : IdentityDbContext<BackedUser>
+    public partial class DataContext : IdentityDbContext<User>
     {
-        public virtual DbSet<Controller> Controllers { get; set; }
+        //public virtual DbSet<Controller> Controllers { get; set; }
         public virtual DbSet<Environment> Environments { get; set; }
         public virtual DbSet<EnvDataSample> EnvDataSamples { get; set; }
         public virtual DbSet<Pet> Pets { get; set; }
@@ -31,10 +31,39 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts
 
             modelBuilder.HasAnnotation("Relational:Collation", "en_US.UTF-8");
 
+            // Ignore Core-compat properties.
+            modelBuilder.Entity<User>()
+                .Ignore(u => u.Pets)
+                .Ignore(u => u.Environments)
+                .Ignore(u => u.Guid) // use Id instead
+                .HasKey(u => u.Id);
+            
+
+            modelBuilder.Entity<Environment>()
+                .Ignore(e => e.Controller)
+                .Ignore(e => e.Inhabitant)
+                .Ignore(e => e.EnvDataSamples)
+                .Ignore(e => e.Users);
+
+            modelBuilder.Entity<Pet>()
+                .Ignore(p => p.Species);
+
+            modelBuilder.Entity<Species>()
+                .Ignore(s => s.Pets);
+
+            modelBuilder.Entity<Controller>()
+                .Ignore(c => c.Environments);
+
             // Add default values for "captured" columns. (e.g. if not provided, default to now)
             modelBuilder.Entity<EnvDataSample>()
+                .Ignore(sample => sample.Occupant)
+                .Ignore(sample => sample.Environment)
                 .Property(e => e.Captured)
                 .HasDefaultValueSql("(NOW() AT TIME ZONE 'utc')");
+
+            // Ensure navigation property EnvDataSample.Occupant, which may not be caught implicitly.
+            //modelBuilder.Entity<EnvDataSample>()
+            //    .HasOne(eds => eds.Occupant);
         }
     }
 }

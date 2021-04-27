@@ -8,5 +8,6 @@ namespace Viv2.API.Core.Constants
     {
         public const string UserAccess = "RequireUserAccess";
         public const string DaemonAccess = "RequireDaemonAccess";
+        public const string AnyAuthenticated = "AnyOrAll";
     }
 }

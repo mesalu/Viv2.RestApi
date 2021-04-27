@@ -37,7 +37,7 @@ namespace Viv2.API.AppInterface.Controllers
             BasicPresenter<NewUserResponse> port = new BasicPresenter<NewUserResponse>();
             var result = await _addUser.Handle(request, port);
 
-            return (result) ? new OkObjectResult(port.Response.UserId) : BadRequest();
+            return (result) ? new OkObjectResult(port.Response.Id) : BadRequest();
         }
         
         [Authorize(Roles = RoleValues.Admin)]

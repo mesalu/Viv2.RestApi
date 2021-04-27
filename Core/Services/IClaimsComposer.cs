@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Security.Claims;
-using Viv2.API.Core.Entities;
+using Viv2.API.Core.ProtoEntities;
 
 namespace Viv2.API.Core.Services
 {
@@ -15,6 +15,6 @@ namespace Viv2.API.Core.Services
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        ClaimsIdentity ComposeIdentity(User user, IEnumerable<Claim> extras = null);
+        ClaimsIdentity ComposeIdentity(IUser user, IEnumerable<Claim> extras = null);
     }
 }

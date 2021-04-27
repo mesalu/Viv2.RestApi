@@ -1,7 +1,6 @@
 namespace Viv2.API.Core.Dto.Response
 {
-    public class NewUserResponse
+    public class NewUserResponse : NewEntityResponse<string>
     {
-        public string UserId { get; set; }
     }
 }

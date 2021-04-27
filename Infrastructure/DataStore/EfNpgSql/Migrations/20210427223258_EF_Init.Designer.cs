@@ -10,8 +10,8 @@ using Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts;
 namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20210416192332_UserEmailField")]
-    partial class UserEmailField
+    [Migration("20210427223258_EF_Init")]
+    partial class EF_Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,15 +24,15 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
 
             modelBuilder.Entity("EnvironmentUser", b =>
                 {
-                    b.Property<Guid>("EnvironmentsId")
+                    b.Property<Guid>("BackedEnvironmentsId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("UsersId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("BackedUsersId")
+                        .HasColumnType("text");
 
-                    b.HasKey("EnvironmentsId", "UsersId");
+                    b.HasKey("BackedEnvironmentsId", "BackedUsersId");
 
-                    b.HasIndex("UsersId");
+                    b.HasIndex("BackedUsersId");
 
                     b.ToTable("EnvironmentUser");
                 });
@@ -167,131 +167,12 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("Viv2.API.Core.Entities.Controller", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Controllers");
-                });
-
-            modelBuilder.Entity("Viv2.API.Core.Entities.EnvDataSample", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<DateTime>("Captured")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp without time zone")
-                        .HasDefaultValueSql("(NOW() AT TIME ZONE 'utc')");
-
-                    b.Property<double?>("ColdGlass")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("ColdMat")
-                        .HasColumnType("double precision");
-
-                    b.Property<Guid?>("EnvironmentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<double?>("HotGlass")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("HotMat")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("MidGlass")
-                        .HasColumnType("double precision");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EnvironmentId");
-
-                    b.ToTable("EnvDataSamples");
-                });
-
-            modelBuilder.Entity("Viv2.API.Core.Entities.Environment", b =>
-                {
-                    b.Property<Guid?>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("BackedUserId")
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("ControllerId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Descr")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("InhabitantId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Model")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BackedUserId");
-
-                    b.HasIndex("ControllerId");
-
-                    b.HasIndex("InhabitantId");
-
-                    b.ToTable("Environments");
-                });
-
-            modelBuilder.Entity("Viv2.API.Core.Entities.Pet", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("BackedUserId")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("HatchDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("Morph")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("SpeciesId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BackedUserId");
-
-                    b.HasIndex("SpeciesId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Pets");
-                });
-
-            modelBuilder.Entity("Viv2.API.Core.Entities.RefreshToken", b =>
+            modelBuilder.Entity("Viv2.API.Core.ProtoEntities.RefreshToken", b =>
                 {
                     b.Property<string>("Token")
                         .HasColumnType("text");
 
                     b.Property<string>("AccessCapacity")
-                        .HasColumnType("text");
-
-                    b.Property<string>("BackedUserId")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("ExpiresAt")
@@ -303,19 +184,128 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
                     b.Property<Guid>("IssuedTo")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
 
                     b.HasKey("Token");
-
-                    b.HasIndex("BackedUserId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("RefreshToken");
                 });
 
-            modelBuilder.Entity("Viv2.API.Core.Entities.Species", b =>
+            modelBuilder.Entity("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Controller", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Controller");
+                });
+
+            modelBuilder.Entity("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.EnvDataSample", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<DateTime>("Captured")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValueSql("(NOW() AT TIME ZONE 'utc')");
+
+                    b.Property<double>("ColdGlass")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("ColdMat")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("HotGlass")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("HotMat")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("MidGlass")
+                        .HasColumnType("double precision");
+
+                    b.Property<Guid>("RealEnvironmentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("RealOccupantId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RealEnvironmentId");
+
+                    b.HasIndex("RealOccupantId");
+
+                    b.ToTable("EnvDataSamples");
+                });
+
+            modelBuilder.Entity("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Environment", b =>
+                {
+                    b.Property<Guid?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ControllerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Descr")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Model")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("RealInhabitantId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ControllerId");
+
+                    b.HasIndex("RealInhabitantId");
+
+                    b.ToTable("Environments");
+                });
+
+            modelBuilder.Entity("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Pet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<DateTime?>("HatchDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Morph")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("RealSpeciesId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RealSpeciesId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Pets");
+                });
+
+            modelBuilder.Entity("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Species", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -330,24 +320,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
                     b.ToTable("Species");
                 });
 
-            modelBuilder.Entity("Viv2.API.Core.Entities.User", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("User");
-                });
-
-            modelBuilder.Entity("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.BackedUser", b =>
+            modelBuilder.Entity("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.User", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -371,6 +344,9 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -413,15 +389,15 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
 
             modelBuilder.Entity("EnvironmentUser", b =>
                 {
-                    b.HasOne("Viv2.API.Core.Entities.Environment", null)
+                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Environment", null)
                         .WithMany()
-                        .HasForeignKey("EnvironmentsId")
+                        .HasForeignKey("BackedEnvironmentsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Viv2.API.Core.Entities.User", null)
+                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.User", null)
                         .WithMany()
-                        .HasForeignKey("UsersId")
+                        .HasForeignKey("BackedUsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -437,7 +413,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.BackedUser", null)
+                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -446,7 +422,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.BackedUser", null)
+                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -461,7 +437,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.BackedUser", null)
+                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -470,96 +446,81 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.BackedUser", null)
+                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Viv2.API.Core.Entities.EnvDataSample", b =>
+            modelBuilder.Entity("Viv2.API.Core.ProtoEntities.RefreshToken", b =>
                 {
-                    b.HasOne("Viv2.API.Core.Entities.Environment", "Environment")
-                        .WithMany("EnvDataSamples")
-                        .HasForeignKey("EnvironmentId");
-
-                    b.Navigation("Environment");
+                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.User", null)
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("Viv2.API.Core.Entities.Environment", b =>
+            modelBuilder.Entity("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.EnvDataSample", b =>
                 {
-                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.BackedUser", null)
-                        .WithMany("Environments")
-                        .HasForeignKey("BackedUserId");
+                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Environment", "RealEnvironment")
+                        .WithMany("Samples")
+                        .HasForeignKey("RealEnvironmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("Viv2.API.Core.Entities.Controller", "Controller")
-                        .WithMany("Environments")
+                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Pet", "RealOccupant")
+                        .WithMany()
+                        .HasForeignKey("RealOccupantId");
+
+                    b.Navigation("RealEnvironment");
+
+                    b.Navigation("RealOccupant");
+                });
+
+            modelBuilder.Entity("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Environment", b =>
+                {
+                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Controller", null)
+                        .WithMany("BackedEnvironments")
                         .HasForeignKey("ControllerId");
 
-                    b.HasOne("Viv2.API.Core.Entities.Pet", "Inhabitant")
+                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Pet", "RealInhabitant")
                         .WithMany()
-                        .HasForeignKey("InhabitantId");
+                        .HasForeignKey("RealInhabitantId");
 
-                    b.Navigation("Controller");
-
-                    b.Navigation("Inhabitant");
+                    b.Navigation("RealInhabitant");
                 });
 
-            modelBuilder.Entity("Viv2.API.Core.Entities.Pet", b =>
+            modelBuilder.Entity("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Pet", b =>
                 {
-                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.BackedUser", null)
-                        .WithMany("Pets")
-                        .HasForeignKey("BackedUserId");
+                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Species", "RealSpecies")
+                        .WithMany("BackedPets")
+                        .HasForeignKey("RealSpeciesId");
 
-                    b.HasOne("Viv2.API.Core.Entities.Species", "Species")
-                        .WithMany("Pets")
-                        .HasForeignKey("SpeciesId");
-
-                    b.HasOne("Viv2.API.Core.Entities.User", null)
-                        .WithMany("Pets")
+                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.User", null)
+                        .WithMany("BackedPets")
                         .HasForeignKey("UserId");
 
-                    b.Navigation("Species");
+                    b.Navigation("RealSpecies");
                 });
 
-            modelBuilder.Entity("Viv2.API.Core.Entities.RefreshToken", b =>
+            modelBuilder.Entity("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Controller", b =>
                 {
-                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.BackedUser", null)
-                        .WithMany("RefreshTokens")
-                        .HasForeignKey("BackedUserId");
-
-                    b.HasOne("Viv2.API.Core.Entities.User", null)
-                        .WithMany("RefreshTokens")
-                        .HasForeignKey("UserId");
+                    b.Navigation("BackedEnvironments");
                 });
 
-            modelBuilder.Entity("Viv2.API.Core.Entities.Controller", b =>
+            modelBuilder.Entity("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Environment", b =>
                 {
-                    b.Navigation("Environments");
+                    b.Navigation("Samples");
                 });
 
-            modelBuilder.Entity("Viv2.API.Core.Entities.Environment", b =>
+            modelBuilder.Entity("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Species", b =>
                 {
-                    b.Navigation("EnvDataSamples");
+                    b.Navigation("BackedPets");
                 });
 
-            modelBuilder.Entity("Viv2.API.Core.Entities.Species", b =>
+            modelBuilder.Entity("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.User", b =>
                 {
-                    b.Navigation("Pets");
-                });
-
-            modelBuilder.Entity("Viv2.API.Core.Entities.User", b =>
-                {
-                    b.Navigation("Pets");
-
-                    b.Navigation("RefreshTokens");
-                });
-
-            modelBuilder.Entity("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.BackedUser", b =>
-                {
-                    b.Navigation("Environments");
-
-                    b.Navigation("Pets");
+                    b.Navigation("BackedPets");
 
                     b.Navigation("RefreshTokens");
                 });

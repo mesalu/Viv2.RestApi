@@ -8,9 +8,9 @@ using Viv2.API.Core.Constants;
 using Viv2.API.Core.Dto;
 using Viv2.API.Core.Dto.Request;
 using Viv2.API.Core.Dto.Response;
-using Viv2.API.Core.Entities;
 using Viv2.API.Core.Interfaces;
 using Viv2.API.Core.Interfaces.UseCases;
+using Viv2.API.Core.ProtoEntities;
 using Viv2.API.Core.Services;
 
 namespace Viv2.API.Core.UseCases
@@ -52,7 +52,7 @@ namespace Viv2.API.Core.UseCases
                 {
                     Token = _minter.Mint(identity, TokenType.Refresh),
                     ExpiresAt = (DateTime.UtcNow + TimeSpan.FromSeconds(_minter.Options.RefreshTokenLifespan)),
-                    IssuedTo = user.Id,
+                    IssuedTo = user.Guid,
                     IssuedBy = Dns.GetHostName(),
                     AccessCapacity = RoleValues.User
                 }

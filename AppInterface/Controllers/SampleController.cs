@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,8 +9,8 @@ using Viv2.API.Core.Constants;
 using Viv2.API.Core.Dto;
 using Viv2.API.Core.Dto.Request;
 using Viv2.API.Core.Dto.Response;
-using Viv2.API.Core.Entities;
 using Viv2.API.Core.Interfaces.UseCases;
+using Viv2.API.Core.ProtoEntities;
 using Viv2.API.Core.Services;
 
 namespace Viv2.API.AppInterface.Controllers
@@ -50,13 +49,12 @@ namespace Viv2.API.AppInterface.Controllers
         [HttpGet]
         public async Task<IActionResult> GetSamples()
         {
-            var userId = Guid.Parse("55e3cd09-82b1-4383-aabf-766568b8f5b1"); 
-            //Helpers.UserCompatHelper.UserGuidFromAuthenticatedContext(HttpContext);
+            var userId = _claimsCompat.ExtractFirstIdClaim(HttpContext.User);
 
-            BasicPresenter<GenericDataResponse<ICollection<EnvDataSample>>> port = 
-                new BasicPresenter<GenericDataResponse<ICollection<EnvDataSample>>>();
+            BasicPresenter<GenericDataResponse<ICollection<IEnvDataSample>>> port = 
+                new BasicPresenter<GenericDataResponse<ICollection<IEnvDataSample>>>();
 
-            DataAccessRequest<ICollection<EnvDataSample>> request = new DataAccessRequest<ICollection<EnvDataSample>>();
+            DataAccessRequest<ICollection<IEnvDataSample>> request = new DataAccessRequest<ICollection<IEnvDataSample>>();
             request.UserId = userId;
 
             var success = await _sampleRetrieval.Handle(request, port);

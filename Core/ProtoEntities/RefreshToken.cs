@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Viv2.API.Core.Entities
+namespace Viv2.API.Core.ProtoEntities
 {
  
     /// <summary>

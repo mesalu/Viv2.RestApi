@@ -29,6 +29,9 @@ namespace Viv2.API.AppInterface
             services.ApplyUseCases();
             
             // Add supporting services.
+            /* TODO: These functions un-"onion" the project (imposes a dependency through core)
+             *       so ideally we want to find a better way to do this.
+             */
             services.AddDataStore(BackingStoreTypes.EfIdent, Configuration);
             services.AddTokenAuth(TokenMinterTypes.JWS, Configuration);
         }

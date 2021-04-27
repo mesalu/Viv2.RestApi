@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Viv2.API.Core.Dto.Request;
 using Viv2.API.Core.Interfaces.UseCases;
 
 namespace Viv2.API.Core.UseCases
@@ -13,6 +14,9 @@ namespace Viv2.API.Core.UseCases
             services.AddTransient<IAddUserUseCase, AddUserUseCase>();
             services.AddTransient<IModifyUserRolesUseCase, ModifyUserRolesUseCase>();
             services.AddTransient<IGetSamplesUseCase, GetSampleDataUseCase>();
+            services.AddTransient<IAddPetUseCase, AddPetUseCase>();
+            services.AddTransient<IRegisterEnvironmentUseCase, RegisterEnvironmentUseCase>();
+            services.AddTransient<IGetEnvironmentsUseCase, GetEnvironmentUseCase>();
         }
     }
 }

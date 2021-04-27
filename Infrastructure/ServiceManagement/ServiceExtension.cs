@@ -57,6 +57,9 @@ namespace Viv2.API.Infrastructure.ServiceManagement
             // Add the MsIDent claims composer
             services.AddSingleton<IClaimsComposer, MsIdent.ClaimsComposer>();
             
+            // Add the entity factory
+            services.AddTransient<IEntityFactory, EntityFactory>();
+            
             // Add backing store:
             services.AddDbContext<DataContext>(options => 
                 options.UseNpgsql(configuration.GetConnectionString("DataContextConnectionString")));
@@ -65,7 +68,7 @@ namespace Viv2.API.Infrastructure.ServiceManagement
             services.AddScoped<IPetBackingStore, PetStore>();
             services.AddScoped<IEnvironmentBackingStore, EnvironmentStore>();
 
-            services.AddIdentity<BackedUser, IdentityRole>(options =>
+            services.AddIdentity<User, IdentityRole>(options =>
                 {
                     // Password settings.
                     options.Password.RequireDigit = true;
@@ -114,6 +117,11 @@ namespace Viv2.API.Infrastructure.ServiceManagement
                     policy =>
                     {
                         policy.RequireClaim(ClaimNames.AccessType, AccessLevelValues.Daemon);
+                    });
+                options.AddPolicy(PolicyNames.AnyAuthenticated,
+                    policy =>
+                    {
+                        policy.RequireAuthenticatedUser();
                     });
             });
         }

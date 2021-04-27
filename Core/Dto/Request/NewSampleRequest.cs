@@ -1,6 +1,5 @@
 using System;
 using Viv2.API.Core.Dto.Response;
-using Viv2.API.Core.Entities;
 using Viv2.API.Core.Interfaces;
 
 namespace Viv2.API.Core.Dto.Request

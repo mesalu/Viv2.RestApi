@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Viv2.API.Core.Dto.Request;
 using Viv2.API.Core.Dto.Response;
-using Viv2.API.Core.Entities;
 using Viv2.API.Core.Interfaces;
 using Viv2.API.Core.Interfaces.UseCases;
+using Viv2.API.Core.ProtoEntities;
 using Viv2.API.Core.Services;
 
 namespace Viv2.API.Core.UseCases
@@ -18,14 +18,14 @@ namespace Viv2.API.Core.UseCases
             _backingStore = backingStore;
         }
         
-        public Task<bool> Handle(DataAccessRequest<ICollection<EnvDataSample>> message, IOutboundPort<GenericDataResponse<ICollection<EnvDataSample>>> outputPort)
+        public Task<bool> Handle(DataAccessRequest<ICollection<IEnvDataSample>> message, IOutboundPort<GenericDataResponse<ICollection<IEnvDataSample>>> outputPort)
         {
             // TODO
             
             // placeholder:
-            List<EnvDataSample> samples = new List<EnvDataSample>();
-            GenericDataResponse<ICollection<EnvDataSample>> response =
-                new GenericDataResponse<ICollection<EnvDataSample>>();
+            List<IEnvDataSample> samples = new List<IEnvDataSample>();
+            GenericDataResponse<ICollection<IEnvDataSample>> response =
+                new GenericDataResponse<ICollection<IEnvDataSample>>();
             response.Result = samples;
             
             outputPort.Handle(response);

@@ -62,7 +62,7 @@ namespace Viv2.API.Infrastructure.JwtMinting.Jws
                 // Jwt Issued-At
                 new Claim(JwtRegisteredClaimNames.Iat, utcNow.ToString(), ClaimValueTypes.Integer64),
 
-                // User Id (Use audience for JWT tokens)
+                // User Guid (Use audience for JWT tokens)
                 new Claim(JwtRegisteredClaimNames.Aud, idClaimValue)
             });
             

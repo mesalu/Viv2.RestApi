@@ -1,37 +1,39 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Viv2.API.Core.Entities;
+using Viv2.API.Core.ProtoEntities;
 using Viv2.API.Core.Services;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities;
+using Environment = Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Environment;
 
 namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
 {
     public class UserStore : IUserBackingStore
     {
-        private readonly UserManager<BackedUser> _userManager;
+        private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly DataContext _context;
 
-        public UserStore(UserManager<BackedUser> userManager, RoleManager<IdentityRole> roleManager, DataContext context)
+        public UserStore(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, DataContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _context = context;
         }
         
-        public async Task<User> GetUserByName(string name) => (await _userManager.FindByNameAsync(name))?.ToCoreUser();
+        public async Task<IUser> GetUserByName(string name) => await _userManager.FindByNameAsync(name);
 
-        public async Task<User> GetUserById(Guid id) => (await _userManager.FindByIdAsync(id.ToString()))?.ToCoreUser();
+        public async Task<IUser> GetUserById(Guid id) => await _userManager.FindByIdAsync(id.ToString());
 
-        public async Task<Guid> CreateUser(User user, string password)
+        public async Task<Guid> CreateUser(IUser user, string password)
         {
             // Don't need to use the full `applycoreuser` method, as most fields will be empty
-            // also, copying the Id around can be detrimental at this phase.
-            BackedUser backableUser = new BackedUser
+            // also, copying the Guid around can be detrimental at this phase.
+            User backableUser = new User
             {
                 UserName = user.Name,
                 Email = user.Email,
@@ -45,7 +47,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
                     // _userManager doesn't seem to back-assign fields filled during creation, so to get
                     // those (namely, the ID), we'll need to load from store... wooo.
                     backableUser = await _userManager.FindByNameAsync(backableUser.UserName);
-                    return Guid.Parse(backableUser.Id);
+                    return backableUser.Guid;
                 }
             }
             catch (Exception)
@@ -56,53 +58,106 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
             return Guid.Empty;
         }
 
-        public async Task<bool> CheckPassword(User user, string password)
+        public async Task<bool> CheckPassword(IUser user, string password)
         {
             // Well this is an unfortunate side effect of abstraction, and there may be a C#-ism to 
             // mitigate it that I'm not familiar with (maybe partial classes?) Since BackedUser can't directly
             // inherit from Core.Entities.User, we have a conversion method, but that doesn't let us treat
             // Core.Entity.User method as a BackedUser, so we must convert back via hitting the data store. :\
             // TODO: see if just pulling user ID from `user` works for CheckPasswordAsync.
-            BackedUser storedUser = await _userManager.FindByIdAsync(user.Id.ToString());
+            var storedUser = user as User;
             return await _userManager.CheckPasswordAsync(storedUser, password);
         }
 
-        public async Task PutUser(User user)
+        public async Task PutUser(IUser user)
         {
+            // just to keep warnings down (for now)
+            var unused = await Task.FromResult(false);
             throw new System.NotImplementedException();
         }
 
-        public async Task UpdateUser(User user)
+        public async Task UpdateUser([NotNull] IUser user)
         {
-            var backedUser = await _userManager.FindByIdAsync(user.Id.ToString());
-            backedUser.ApplyCoreUser(user);
+            // attempt a type-safe downcast.
+            var backedUser = (user as User);
+            if (backedUser == null) throw new ArgumentException("Cannot update implementation of IUser");
             await _userManager.UpdateAsync(backedUser);
         }
 
-        public async Task<IEnumerable<string>> GetRoles(User user)
+        public async Task<IEnumerable<string>> GetRoles(IUser user)
         {
             // prefer fetching user from user manager as it may be tracked.
-            var backedUser = await _userManager.FindByIdAsync(user.Id.ToString());
+            var backedUser = user as User;
+            if (backedUser == null) throw new ArgumentException("Datastore implementation mismatch.");
             return await _userManager.GetRolesAsync(backedUser);
         }
 
-        public async Task AddToRoles(User user, IEnumerable<string> rolesToAdd)
+        public async Task AddToRoles(IUser user, IEnumerable<string> rolesToAdd)
         {
             // not fond of doing this per operation, but it is what it is.
             var asList = rolesToAdd.ToList(); // prevent multiple-enumeration issues.
             foreach (var role in asList) await _CreateRoleIfMissing(role);
             
-            // prefer fetching user from user manager as it may be tracked at this point.
-            var backedUser = await _userManager.FindByIdAsync(user.Id.ToString());
+            var backedUser = user as User;
+            if (backedUser == null) throw new ArgumentException("Datastore implementation mismatch.");
             await _userManager.AddToRolesAsync(backedUser, asList);
         }
 
-        public async Task RemoveRolesFromUser(User user)
+        public async Task RemoveRolesFromUser(IUser user)
         {
-            var backedUser = await _userManager.FindByIdAsync(user.Id.ToString());
-
+            var backedUser = user as User;
+            if (backedUser == null) throw new ArgumentException("Datastore implementation mismatch.");
             var roles = await _userManager.GetRolesAsync(backedUser);
             await _userManager.RemoveFromRolesAsync(backedUser, roles);
+        }
+
+        public async Task<ICollection<IEnvironment>> LoadEnvironments(IUser user, bool force = false)
+        {
+            // if we can shortcut:
+            if (!force && user.Environments.Count > 0) return user.Environments;
+
+            var backedUser = user as User;
+            if (backedUser == null) throw new ArgumentException("Datastore implementation mismatch.");
+            await _context.Entry(backedUser).Collection(u => u.BackedEnvironments).LoadAsync();
+
+            return user.Environments;
+        }
+
+        public async Task<ICollection<RefreshToken>> LoadRefreshTokens(IUser user, bool force = false)
+        {
+            if (!force && user.RefreshTokens.Count > 0) return user.RefreshTokens;
+
+            var backedUser = user as User;
+            if (backedUser == null) throw new ArgumentException("Datastore implementation mismatch.");
+            await _context.Entry(backedUser).Collection(u => u.RefreshTokens).LoadAsync();
+            return user.RefreshTokens;
+        }
+
+
+        public async Task AddAssociationToEnv([NotNull] IUser user, [NotNull] IEnvironment environment)
+        {
+            if (!(user is User && environment is Environment)) 
+                throw new ArgumentException("Mismatched Datastore implementations");
+
+            // can direct cast here, as we know the type is safe.
+            var concreteUser = (User) user;
+            var concreteEnv = (Environment) environment;
+            
+            // find a collection that's already loaded (avoid extra leg work)
+            if (_context.Entry(concreteUser).Collection(u => u.BackedEnvironments).IsLoaded)
+                concreteUser.BackedEnvironments.Add(concreteEnv);
+            
+            // else, lets check if its loaded for the environment
+            else if (_context.Entry(concreteEnv).Collection(e => e.BackedUsers).IsLoaded)
+                concreteEnv.BackedUsers.Add(concreteUser);
+            else
+            {
+                // neither loaded, load one (lets prefer the user nav property for no reason)
+                await _context.Entry(concreteUser).Collection(u => u.BackedEnvironments).LoadAsync();
+                concreteUser.BackedEnvironments.Add(concreteEnv);
+            }
+
+            await _context.SaveChangesAsync();
         }
 
         /// <summary>

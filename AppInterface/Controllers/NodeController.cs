@@ -7,7 +7,7 @@ namespace Viv2.API.AppInterface.Controllers
 {
     /// <summary>
     /// An interface for accessing and manipulating NodeController data.
-    /// This class is reduced to just `node`, as NodeControllerController was... unideal.
+    /// This class name is reduced to just `node`, as NodeControllerController was... unideal.
     /// </summary>
     [Authorize(Policy = PolicyNames.UserAccess)]
     [ApiController]
