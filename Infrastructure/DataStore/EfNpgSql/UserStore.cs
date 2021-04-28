@@ -123,7 +123,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
             return user.Environments;
         }
 
-        public async Task<ICollection<RefreshToken>> LoadRefreshTokens(IUser user, bool force = false)
+        public async Task<ICollection<RefreshToken>> LoadRefreshTokens([NotNull] IUser user, bool force = false)
         {
             if (!force && user.RefreshTokens.Count > 0) return user.RefreshTokens;
 

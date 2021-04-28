@@ -37,8 +37,6 @@ namespace Viv2.API.Core.UseCases
             {
                 case RegisterEnvironmentRequest.Mode.Touch: 
                     // Check if user already has it:
-                    Console.WriteLine($"User?.Env?.Count: {user?.Environments?.Count}");
-                    Console.WriteLine($"message.MfgId: {message.MfgId.ToString()}");
                     var env = user?.Environments?.FirstOrDefault(e => e.Id == message.MfgId);
                     
                     // check if we have this environment already - and that its associated to user
@@ -48,8 +46,6 @@ namespace Viv2.API.Core.UseCases
                     {
                         // This next line should be impossible - its just here to keep linting happy.
                         if (env.Id == null) throw new Exception("Malformed input on this entity");
-                        
-                        Console.WriteLine("Found the env entity!");
 
                         // we already have it and its associated to user.
                         // should be same as message.MfgId
@@ -58,14 +54,9 @@ namespace Viv2.API.Core.UseCases
                     }
                     else if (user == null) return false; // nothing to do, this is a mis-use.
                     else
-                    {
                         // Apparently we gotta explicitly mimic fallthrough...
-                        Console.WriteLine($"Failed to find env (user => {user?.Name})");
                         goto case RegisterEnvironmentRequest.Mode.Create;
 
-                    }
-                        
-                    
                 case RegisterEnvironmentRequest.Mode.Create:
                     // Environments need an initial user:
                     if (user == null) return false;

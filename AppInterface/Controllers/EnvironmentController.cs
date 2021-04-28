@@ -52,8 +52,6 @@ namespace Viv2.API.AppInterface.Controllers
                 CreateMode = RegisterEnvironmentRequest.Mode.Touch,
             };
 
-            Console.WriteLine($"Found user: {request.Owner}");            
-
             var port = new BasicPresenter<NewEntityResponse<Guid>>();
             var success = await _registerEnvironment.Handle(request, port);
 

@@ -23,26 +23,38 @@ namespace Viv2.API.AppInterface.Controllers
     public class SampleController : ControllerBase
     {
         private readonly IGetSamplesUseCase _sampleRetrieval;
+        private readonly IAddSampleUseCase _addSample;
         private readonly IClaimIdentityCompat _claimsCompat;
         
-        public SampleController(IGetSamplesUseCase getSamplesUseCase, IClaimIdentityCompat claimsCompat)
+        public SampleController(IGetSamplesUseCase getSamplesUseCase, IClaimIdentityCompat claimsCompat,
+            IAddSampleUseCase addSample)
         {
             _sampleRetrieval = getSamplesUseCase;
             _claimsCompat = claimsCompat;
+            _addSample = addSample;
         }
 
         [Authorize(Policy = PolicyNames.DaemonAccess)]
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<IActionResult> PostNewSample([FromBody] EnvSampleSubmission sample)
         {
             // Ensure model is correctly populated.
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid
+                || sample.Environment == Guid.Empty) return BadRequest(ModelState);
             
             // Submit to core:
             var userId = _claimsCompat.ExtractFirstIdClaim(HttpContext.User);
             if (userId == Guid.Empty) return BadRequest("Who are you?");
 
-            return await Task.FromResult<IActionResult>(BadRequest("Not yet implemented"));
+            var request = new NewSampleRequest
+            {
+                Sample = sample,
+                UserId = userId
+            };
+            var port = new BasicPresenter<BlankResponse>();
+            
+            var success = await _addSample.Handle(request, port);
+            return (success) ? Ok() : BadRequest("Failed to post sample");
         }
 
         [Authorize(Policy = PolicyNames.UserAccess)]

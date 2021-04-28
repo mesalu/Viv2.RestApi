@@ -33,9 +33,7 @@ namespace Viv2.API.Core.UseCases
             
             var env = user?.Environments.FirstOrDefault(e => e.Id == message.Sample.Environment);
             if (env == null) return false; // environment not owned by user or user not found.
-
-            // TODO: ensure the pet reference is loaded in above search.
-           
+            
             // Fill in EnvDataSample entity instance.
             var sample = _entityFactory.GetSampleBuilder()
                 .AddHotGlassMeasurement(message.Sample.HotGlass ?? 0)
@@ -44,6 +42,7 @@ namespace Viv2.API.Core.UseCases
                 .AddColdGlassMeasurement(message.Sample.ColdGlass ?? 0)
                 .AddColdMatMeasurement(message.Sample.ColdMat ?? 0)
                 .SetInhabitant(env.Inhabitant)
+                .SetEnvironment(env)
                 .Build();
 
             await _envStore.AddSample(sample);

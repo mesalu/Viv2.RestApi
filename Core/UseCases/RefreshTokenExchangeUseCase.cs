@@ -30,6 +30,8 @@ namespace Viv2.API.Core.UseCases
         {
             // Verify user exists.
             var user = await _backingStore.GetUserById(Guid.Parse(message.UserId));
+            if (user == null) return false;
+            
             await _backingStore.LoadRefreshTokens(user);
             
             // Verify refresh token specified by message is associated to user.

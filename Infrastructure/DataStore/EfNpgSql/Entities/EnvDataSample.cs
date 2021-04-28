@@ -12,18 +12,19 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
         
         // What Core accesses
         [NotMapped]
-        public IEnvironment Environment 
+        public IEnvironment? Environment 
         { 
             get => RealEnvironment;
             set
             {
-                if (value is Environment env) RealEnvironment = env;
+                if (value == null) RealEnvironment = null;
+                else if (value is Environment env) RealEnvironment = env;
                 else throw new ArgumentException("Mismatched infrastructure data store backings");
             } 
         }
         
         // what EF needs.
-        public Environment RealEnvironment { get; set; }
+        public Environment? RealEnvironment { get; set; }
         
         // what Core needs
         [NotMapped]
@@ -32,27 +33,27 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
             get => RealOccupant;
             set
             {
-                if (value is Pet pet) RealOccupant = pet;
+                if (value == null) RealOccupant = null;
+                else if (value is Pet pet) RealOccupant = pet;
                 else throw new ArgumentException("Mismatched infrastructure data store backings");
             }
         }
 
         // what EF needs
         public Pet? RealOccupant { get; set; }
-        
-        
+
         private DateTime? _captured;
-        public DateTime Captured
+        public DateTime? Captured
         {
             get
             {
                 if (_captured.HasValue && _captured.Value.Kind == DateTimeKind.Unspecified)
                     // Part of Core's spec to Infrastructure providers is that all date time values are UTC.
-                    // if the infrastructure component is messing up, but including the locale, we can correct
-                    // but otherwise we're forced to assume that Kind is UTC.
+                    // NpgSql is somewhat timezone aware but it appears that postgres is still treating datetime
+                    // objects naively, so correct for that here.
                     return DateTime.SpecifyKind(_captured.Value, DateTimeKind.Utc);
                 
-                return _captured ?? DateTime.MinValue;
+                return _captured;
             }
             set => _captured = value;
         }

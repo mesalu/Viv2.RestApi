@@ -17,6 +17,7 @@ namespace Viv2.API.Core.UseCases
             services.AddTransient<IAddPetUseCase, AddPetUseCase>();
             services.AddTransient<IRegisterEnvironmentUseCase, RegisterEnvironmentUseCase>();
             services.AddTransient<IGetEnvironmentsUseCase, GetEnvironmentUseCase>();
+            services.AddTransient<IAddSampleUseCase, AddSampleUseCase>();
         }
     }
 }
