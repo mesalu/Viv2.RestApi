@@ -56,8 +56,9 @@ namespace Viv2.API.Core.UseCases
             var mintedRefreshToken = message.EncodedRefreshToken;
             
             // compose and submit response.
-            LoginResponse response = new LoginResponse
+            var response = new LoginResponse
             {
+                UserName = (persistedToken.AccessCapacity == AccessLevelValues.User) ? user.Name: null,
                 AccessToken = new AccessToken
                 {
                     Token = mintedAccessToken,

@@ -36,6 +36,7 @@ namespace Viv2.API.Core.UseCases
             // Mint a data access token.
             var response = new LoginResponse
             {
+                UserName = null, // not necessary for Daemons
                 AccessToken = new AccessToken
                 {
                     Token = _minter.Mint(_claimsComposer.ComposeIdentity(user), TokenType.DaemonAccess),

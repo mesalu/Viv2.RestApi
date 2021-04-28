@@ -43,6 +43,7 @@ namespace Viv2.API.Core.UseCases
             ClaimsIdentity identity = _claimsComposer.ComposeIdentity(user, roleClaims);
             var response = new LoginResponse
             {
+                UserName = user.Name,
                 AccessToken = new AccessToken
                 {
                     Token = _minter.Mint(identity, TokenType.UserAccess),
