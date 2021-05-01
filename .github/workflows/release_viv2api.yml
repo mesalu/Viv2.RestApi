@@ -23,6 +23,12 @@ jobs:
       with:
         dotnet-version: '5.0.x'
 
+    - name: Recompose deployment config
+      env:
+        CONNECTION_STRING: ${{ secrets.PG_DB_CONNECTIONSTRING }}
+      run: |
+        sed -i "s/CONNECTION_STRING_PLACEHOLDER/$CONNECTION_STRING"
+
     - name: Build with dotnet
       run: dotnet build --configuration Release
 
@@ -36,4 +42,3 @@ jobs:
         slot-name: Production
         publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_059236BCA6A24675A737823080527229 }}
         package: ${{env.DOTNET_ROOT}}/myapp
-
