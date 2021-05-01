@@ -8,7 +8,7 @@ namespace Viv2.API.Core.Interfaces
     /// E.g. an application may request the invocation of the 'login' use case, which consumes a LoginRequest
     /// and provides a LoginReponse once processing has been handled by the correct extension of this interface.
     /// </summary>
-    public interface IUseCaseRequestHandler<in TUseCaseRequest, TUseCaseResponse> where TUseCaseRequest : IUseCaseRequest<TUseCaseResponse>
+    public interface IUseCaseRequestHandler<in TUseCaseRequest, out TUseCaseResponse> where TUseCaseRequest : IUseCaseRequest<TUseCaseResponse>
     {
         Task<bool> Handle(TUseCaseRequest message, IOutboundPort<TUseCaseResponse> outputPort);
     }

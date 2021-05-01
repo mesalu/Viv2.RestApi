@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Viv2.API.Core.Adapters;
 using Viv2.API.Core.Exceptions;
 using Viv2.API.Core.ProtoEntities;
-using Viv2.API.Core.Services;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities;
 using Environment = Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Environment;
@@ -97,6 +97,17 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
             if (concrete == null) throw new ArgumentException("Mismatched datastore implementations");
             await _context.EnvDataSamples.AddAsync(concrete);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<IPet> LoadPetFor([NotNull] IEnvironment env, bool force = false)
+        {
+            if (!force && env.Inhabitant != null) return env.Inhabitant; 
+            
+            var concrete = env as Environment;
+            if (concrete == null) throw new ArgumentException("Mismatched datastore implementations");
+
+            await _context.Entry(concrete).Reference(e => e.RealInhabitant).LoadAsync();
+            return env.Inhabitant;
         }
     }
 }

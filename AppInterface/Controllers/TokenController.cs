@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Viv2.API.AppInterface.Constants;
 using Viv2.API.AppInterface.Ports;
 using Viv2.API.AppInterface.Dto;
+using Viv2.API.Core.Adapters;
 using Viv2.API.Core.Constants;
 using Viv2.API.Core.Dto.Request;
 using Viv2.API.Core.Dto.Response;
 using Viv2.API.Core.Interfaces.UseCases;
-using Viv2.API.Core.Services;
 
 namespace Viv2.API.AppInterface.Controllers
 {

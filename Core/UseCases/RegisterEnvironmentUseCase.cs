@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Viv2.API.Core.Adapters;
 using Viv2.API.Core.Dto.Request;
 using Viv2.API.Core.Dto.Response;
 using Viv2.API.Core.Exceptions;
 using Viv2.API.Core.Interfaces;
 using Viv2.API.Core.Interfaces.UseCases;
 using Viv2.API.Core.ProtoEntities;
-using Viv2.API.Core.Services;
 
 namespace Viv2.API.Core.UseCases
 {

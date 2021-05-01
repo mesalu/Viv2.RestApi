@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Viv2.API.Core.Adapters;
 using Viv2.API.Core.Dto.Request;
 using Viv2.API.Core.Dto.Response;
 using Viv2.API.Core.Interfaces;
 using Viv2.API.Core.Interfaces.UseCases;
 using Viv2.API.Core.ProtoEntities;
-using Viv2.API.Core.Services;
 
 namespace Viv2.API.Core.UseCases
 {
@@ -32,7 +32,9 @@ namespace Viv2.API.Core.UseCases
             if (user != null) await _userStore.LoadEnvironments(user);
             
             var env = user?.Environments.FirstOrDefault(e => e.Id == message.Sample.Environment);
+            
             if (env == null) return false; // environment not owned by user or user not found.
+            await _envStore.LoadPetFor(env);
             
             // Fill in EnvDataSample entity instance.
             var sample = _entityFactory.GetSampleBuilder()

@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Viv2.API.Core.UseCases;
 using Viv2.API.Infrastructure.ServiceManagement;
-using Viv2.API.AppInterface.Logging;
 
 namespace Viv2.API.AppInterface
 {

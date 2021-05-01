@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
-namespace Viv2.API.AppInterface.Logging
+namespace Viv2.API.AppInterface
 { 
     public class Middleware
     {

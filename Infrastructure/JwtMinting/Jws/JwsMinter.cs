@@ -4,9 +4,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
+using Viv2.API.Core.Adapters;
 using Viv2.API.Core.ConfigModel;
 using Viv2.API.Core.Constants;
-using Viv2.API.Core.Services;
 
 namespace Viv2.API.Infrastructure.JwtMinting.Jws
 {

@@ -4,7 +4,7 @@ using Viv2.API.Core.ProtoEntities;
 
 #nullable enable
 
-namespace Viv2.API.Core.Services
+namespace Viv2.API.Core.Adapters
 {
     /// <summary>
     /// Since Core expresses its required 'entities' as interfaces (making them more of a proto-entity)
@@ -87,8 +87,16 @@ namespace Viv2.API.Core.Services
             IPetBuilder SetSpecies(ISpecies species);
             IPetBuilder SetMorph(string morph);
             IPetBuilder SetHatchDate(DateTime date);
+            IPetBuilder SetOwner(IUser user);
         }
-        
+
+        public interface ISpeciesBuilder : IEntityBuilder<ISpecies>
+        {
+            ISpeciesBuilder SetName(string name);
+            ISpeciesBuilder SetScientificName(string name);
+            ISpeciesBuilder SetLatitude(double lat);
+            ISpeciesBuilder SetLongitude(double lng);
+        }
 
         /// <summary>
         /// Gets a new instance of a UserBuilder that the caller can use with impunity
@@ -119,5 +127,12 @@ namespace Viv2.API.Core.Services
         /// </summary>
         /// <returns></returns>
         ISampleBuilder GetSampleBuilder();
+
+        /// <summary>
+        /// Gets a new instance of ISpeciesBuilder that can be used with out conflict
+        /// NOTE: Builder specification does not ensure re-usability after a call to `Build`
+        /// </summary>
+        /// <returns></returns>
+        ISpeciesBuilder GetSpeciesBuilder();
     }
 }

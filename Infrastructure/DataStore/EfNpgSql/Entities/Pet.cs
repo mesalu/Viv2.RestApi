@@ -20,7 +20,12 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
                 if (value is Species species) RealSpecies = species;
             } 
         }
+
+        public User RealCareTaker { get; set; }
         
+        [NotMapped]
+        public IUser CareTaker => RealCareTaker;
+
         public string Name { get; set; }
         public string Morph { get; set; }
         public DateTime? HatchDate { get; set; }

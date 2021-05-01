@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
-using Viv2.API.Core.Services;
+using Viv2.API.Core.Adapters;
 using Viv2.API.Core.Constants;
 using Viv2.API.Core.ProtoEntities;
 

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts;
@@ -9,9 +10,10 @@ using Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts;
 namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20210429085458_ExtraSpeciesInfo")]
+    partial class ExtraSpeciesInfo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -288,17 +290,17 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.Property<string>("RealCareTakerId")
-                        .HasColumnType("text");
-
                     b.Property<int?>("RealSpeciesId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("RealCareTakerId");
-
                     b.HasIndex("RealSpeciesId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Pets");
                 });
@@ -497,15 +499,13 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
 
             modelBuilder.Entity("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Pet", b =>
                 {
-                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.User", "RealCareTaker")
-                        .WithMany("BackedPets")
-                        .HasForeignKey("RealCareTakerId");
-
                     b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Species", "RealSpecies")
                         .WithMany("BackedPets")
                         .HasForeignKey("RealSpeciesId");
 
-                    b.Navigation("RealCareTaker");
+                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.User", null)
+                        .WithMany("BackedPets")
+                        .HasForeignKey("UserId");
 
                     b.Navigation("RealSpecies");
                 });

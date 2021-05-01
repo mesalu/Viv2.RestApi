@@ -1,7 +1,7 @@
 using System;
 using System.Security.Claims;
 
-namespace Viv2.API.Core.Services
+namespace Viv2.API.Core.Adapters
 {
     /// <summary>
     /// Represents a compatibility layer to smooth out any external-facing specifics a

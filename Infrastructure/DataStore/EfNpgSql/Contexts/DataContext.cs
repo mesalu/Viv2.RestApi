@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Viv2.API.Core.ProtoEntities;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities;
+
+using Environment = Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Environment;
 
 /*
  * Design-time notes:
@@ -37,7 +38,10 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts
                 .Ignore(u => u.Environments)
                 .Ignore(u => u.Guid) // use Id instead
                 .HasKey(u => u.Id);
-            
+
+            modelBuilder.Entity<User>()
+                .HasMany<Pet>(u => u.BackedPets)
+                .WithOne(p => p.RealCareTaker);
 
             modelBuilder.Entity<Environment>()
                 .Ignore(e => e.Controller)
@@ -46,7 +50,8 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts
                 .Ignore(e => e.Users);
 
             modelBuilder.Entity<Pet>()
-                .Ignore(p => p.Species);
+                .Ignore(p => p.Species)
+                .Ignore(p => p.CareTaker);
 
             modelBuilder.Entity<Species>()
                 .Ignore(s => s.Pets);

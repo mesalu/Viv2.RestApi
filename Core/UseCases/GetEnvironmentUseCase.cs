@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Viv2.API.Core.Adapters;
 using Viv2.API.Core.Dto.Request;
 using Viv2.API.Core.Dto.Response;
 using Viv2.API.Core.Interfaces;
 using Viv2.API.Core.Interfaces.UseCases;
 using Viv2.API.Core.ProtoEntities;
-using Viv2.API.Core.Services;
 
 namespace Viv2.API.Core.UseCases
 {
@@ -20,18 +20,18 @@ namespace Viv2.API.Core.UseCases
             _userStore = userStore;
         }
             
-        public async Task<bool> Handle(DataAccessRequest<IList<IEnvironment>> message, IOutboundPort<GenericDataResponse<IList<IEnvironment>>> outputPort)
+        public async Task<bool> Handle(DataAccessRequest<IEnvironment> message, IOutboundPort<GenericDataResponse<IEnvironment>> outputPort)
         {
             switch (message.Strategy)
             {
-                case DataAccessRequest<IList<IEnvironment>>.AcquisitionStrategy.All:
+                case DataAccessRequest<IEnvironment>.AcquisitionStrategy.All:
                     // Acquire all associated environments, null-cascade throughout
                     var user = await _userStore.GetUserById(message.UserId);
                     if (user != null) await _userStore.LoadEnvironments(user);
                     var envs = user?.Environments;
                     
                     // Compose a response.
-                    var response = new GenericDataResponse<IList<IEnvironment>>
+                    var response = new GenericDataResponse<IEnvironment>
                     {
                         Result = envs?.ToList()
                     };

@@ -3,7 +3,7 @@ using Viv2.API.Core.Dto.Response;
 
 namespace Viv2.API.Core.Interfaces.UseCases
 {
-    public interface IAddPetUseCase : IUseCaseRequestHandler<NewPetRequest, NewEntityResponse<string>>
+    public interface IAddPetUseCase : IUseCaseRequestHandler<CreatePetRequest, NewEntityResponse<int>>
     {
         
     }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using Viv2.API.Core.ConfigModel;
 
-namespace Viv2.API.Core.Services
+namespace Viv2.API.Core.Adapters
 {
     public enum TokenType
     {

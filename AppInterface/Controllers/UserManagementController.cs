@@ -34,7 +34,7 @@ namespace Viv2.API.AppInterface.Controllers
                 || string.IsNullOrWhiteSpace(request.Email)
                 || string.IsNullOrWhiteSpace(request.Password)) return BadRequest(ModelState);
 
-            BasicPresenter<NewUserResponse> port = new BasicPresenter<NewUserResponse>();
+            var port = new BasicPresenter<NewUserResponse>();
             var result = await _addUser.Handle(request, port);
 
             return (result) ? new OkObjectResult(port.Response.Id) : BadRequest();

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Viv2.API.Core.Adapters;
 using Viv2.API.Core.ProtoEntities;
-using Viv2.API.Core.Services;
 
 #nullable enable
 
@@ -133,10 +133,18 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
                 return this;
             }
 
+            public IEntityFactory.IPetBuilder SetOwner(IUser user)
+            {
+                if (!(user is User)) throw new ArgumentException("Mismatched backing types");
+                _pet.RealCareTaker = (User) user;
+                return this;
+            }
+
             public IPet Build()
             {
                 return new Pet
                 {
+                    RealCareTaker = _pet.RealCareTaker,
                     Name = _pet.Name,
                     Morph = _pet.Morph,
                     Species = _pet.Species,
@@ -206,25 +214,56 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
                 };
             }
         }
-        
-        public IEntityFactory.IUserBuilder GetUserBuilder()
+
+        private sealed class SpeciesBuilder : IEntityFactory.ISpeciesBuilder
         {
-            return new UserBuilder();
+            private readonly Species _species;
+
+            public SpeciesBuilder()
+            {
+                _species = new Species();
+            }
+            
+            public IEntityFactory.ISpeciesBuilder SetName(string name)
+            {
+                _species.Name = name;
+                return this;
+            }
+
+            public IEntityFactory.ISpeciesBuilder SetScientificName(string name)
+            {
+                _species.ScientificName = name;
+                return this;
+            }
+
+            public IEntityFactory.ISpeciesBuilder SetLatitude(double lat)
+            {
+                _species.DefaultLatitude = lat;
+                return this;
+            }
+
+            public IEntityFactory.ISpeciesBuilder SetLongitude(double lng)
+            {
+                _species.DefaultLongitude = lng;
+                return this;
+            }
+
+            public ISpecies Build()
+            {
+                return new Species
+                {
+                    Name = _species.Name,
+                    ScientificName = _species.ScientificName,
+                    DefaultLatitude = _species.DefaultLatitude,
+                    DefaultLongitude = _species.DefaultLongitude
+                };
+            }
         }
 
-        public IEntityFactory.IEnvBuilder GetEnvironmentBuilder()
-        {
-            return new EnvBuilder();
-        }
-
-        public IEntityFactory.IPetBuilder GetPetBuilder()
-        {
-            return new PetBuilder();
-        }
-
-        public IEntityFactory.ISampleBuilder GetSampleBuilder()
-        {
-            return new SampleBuilder();
-        }
+        public IEntityFactory.IUserBuilder GetUserBuilder() => new UserBuilder();
+        public IEntityFactory.IEnvBuilder GetEnvironmentBuilder() => new EnvBuilder();
+        public IEntityFactory.IPetBuilder GetPetBuilder() => new PetBuilder();
+        public IEntityFactory.ISampleBuilder GetSampleBuilder() => new SampleBuilder();
+        public IEntityFactory.ISpeciesBuilder GetSpeciesBuilder() => new SpeciesBuilder();
     }
 }

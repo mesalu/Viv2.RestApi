@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Viv2.API.AppInterface.Constants;
 using Viv2.API.AppInterface.Ports;
+using Viv2.API.Core.Adapters;
 using Viv2.API.Core.Constants;
 using Viv2.API.Core.Dto.Request;
 using Viv2.API.Core.Dto.Response;
 using Viv2.API.Core.Interfaces.UseCases;
 using Viv2.API.Core.ProtoEntities;
-using Viv2.API.Core.Services;
 
 namespace Viv2.API.AppInterface.Controllers
 {
@@ -67,13 +67,13 @@ namespace Viv2.API.AppInterface.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllEnvsForUser()
         {
-            var request = new DataAccessRequest<IList<IEnvironment>>
+            var request = new DataAccessRequest<IEnvironment>
             {
                 UserId = _claimsCompat.ExtractFirstIdClaim(HttpContext.User),
-                Strategy = DataAccessRequest<IList<IEnvironment>>.AcquisitionStrategy.All
+                Strategy = DataAccessRequest<IEnvironment>.AcquisitionStrategy.All
             };
             
-            var port = new BasicPresenter<GenericDataResponse<IList<IEnvironment>>>();
+            var port = new BasicPresenter<GenericDataResponse<IEnvironment>>();
             var success = await _getEnvironments.Handle(request, port);
 
             return (success) ? new OkObjectResult(port.Response.Result.Select(e => e.Id).ToList()) : BadRequest();
@@ -84,13 +84,13 @@ namespace Viv2.API.AppInterface.Controllers
         public async Task<IActionResult> GetEnvInfo(Guid id)
         {
             // piggy back off the 'get all' use.
-            var request = new DataAccessRequest<IList<IEnvironment>>
+            var request = new DataAccessRequest<IEnvironment>
             {
                 UserId = _claimsCompat.ExtractFirstIdClaim(HttpContext.User),
-                Strategy = DataAccessRequest<IList<IEnvironment>>.AcquisitionStrategy.All
+                Strategy = DataAccessRequest<IEnvironment>.AcquisitionStrategy.All
             };
             
-            var port = new BasicPresenter<GenericDataResponse<IList<IEnvironment>>>();
+            var port = new BasicPresenter<GenericDataResponse<IEnvironment>>();
             var success = await _getEnvironments.Handle(request, port);
 
             if (success)

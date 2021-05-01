@@ -1,7 +1,7 @@
 using System;
 using System.Security.Claims;
 using Microsoft.IdentityModel.JsonWebTokens;
-using Viv2.API.Core.Services;
+using Viv2.API.Core.Adapters;
 
 namespace Viv2.API.Infrastructure.JwtMinting
 {

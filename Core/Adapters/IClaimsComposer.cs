@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Security.Claims;
 using Viv2.API.Core.ProtoEntities;
 
-namespace Viv2.API.Core.Services
+namespace Viv2.API.Core.Adapters
 {
     /// <summary>
     /// 

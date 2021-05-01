@@ -4,8 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Viv2.API.Core.Adapters;
 using Viv2.API.Core.ProtoEntities;
-using Viv2.API.Core.Services;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities;
 using Environment = Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Environment;
@@ -133,7 +134,19 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
             return user.RefreshTokens;
         }
 
+        public async Task<ICollection<IPet>> LoadPets([NotNull] IUser user, bool force = false)
+        {
+            var backedUser = user as User;
+            if (backedUser == null) throw new ArgumentException("Datastore implementation mismatch.");
 
+            var collection = _context.Entry(backedUser).Collection(u => u.BackedPets);
+            
+            if (!force && collection.IsLoaded) return user.Pets;
+            
+            await collection.LoadAsync();
+            return user.Pets;
+        }
+        
         public async Task AddAssociationToEnv([NotNull] IUser user, [NotNull] IEnvironment environment)
         {
             if (!(user is User && environment is Environment)) 

@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Viv2.API.Core.Adapters;
 using Viv2.API.Core.Constants;
 using Viv2.API.Core.Dto;
 using Viv2.API.Core.Dto.Request;
@@ -9,7 +12,6 @@ using Viv2.API.Core.Dto.Response;
 using Viv2.API.Core.Interfaces;
 using Viv2.API.Core.Interfaces.UseCases;
 using Viv2.API.Core.ProtoEntities;
-using Viv2.API.Core.Services;
 
 namespace Viv2.API.Core.UseCases
 {
@@ -40,10 +42,14 @@ namespace Viv2.API.Core.UseCases
 
             if (persistedToken == null) return false;
             
+            var roles = await _backingStore.GetRoles(user);
+            var roleClaims = new List<Claim>();
+            roleClaims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
+            
             // Mint a new access token based on the access capacity specified by the refresh token.
             string mintedAccessToken;
             if (persistedToken.AccessCapacity == AccessLevelValues.User)
-                mintedAccessToken = _minter.Mint(_claimsComposer.ComposeIdentity(user), TokenType.UserAccess);
+                mintedAccessToken = _minter.Mint(_claimsComposer.ComposeIdentity(user, roleClaims), TokenType.UserAccess);
             else if (persistedToken.AccessCapacity == AccessLevelValues.Daemon)
                 mintedAccessToken = _minter.Mint(_claimsComposer.ComposeIdentity(user), TokenType.DaemonAccess);
             else

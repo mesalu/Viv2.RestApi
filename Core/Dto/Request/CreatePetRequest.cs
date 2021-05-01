@@ -4,7 +4,7 @@ using Viv2.API.Core.Interfaces;
 
 namespace Viv2.API.Core.Dto.Request
 {
-    public class NewPetRequest : IUseCaseRequest<NewEntityResponse<string>>
+    public class CreatePetRequest : IUseCaseRequest<NewEntityResponse<int>>
     {
         public string Name { get; set; }
         public string Morph { get; set; }

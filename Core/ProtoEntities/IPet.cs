@@ -6,6 +6,7 @@ namespace Viv2.API.Core.ProtoEntities
     {
         public int Id { get; set; }
         public ISpecies Species { get; set; }
+        public IUser CareTaker { get; }
         public string Name { get; set; }
         public string Morph { get; set; }
         public DateTime? HatchDate { get; set; }

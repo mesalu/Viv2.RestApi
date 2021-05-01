@@ -1,17 +1,18 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Viv2.API.AppInterface.Constants;
+using Viv2.API.AppInterface.Dto;
 using Viv2.API.AppInterface.Ports;
+using Viv2.API.Core.Adapters;
 using Viv2.API.Core.Constants;
 using Viv2.API.Core.Dto;
 using Viv2.API.Core.Dto.Request;
 using Viv2.API.Core.Dto.Response;
 using Viv2.API.Core.Interfaces.UseCases;
 using Viv2.API.Core.ProtoEntities;
-using Viv2.API.Core.Services;
 
 namespace Viv2.API.AppInterface.Controllers
 {
@@ -62,16 +63,74 @@ namespace Viv2.API.AppInterface.Controllers
         public async Task<IActionResult> GetSamples()
         {
             var userId = _claimsCompat.ExtractFirstIdClaim(HttpContext.User);
-
-            BasicPresenter<GenericDataResponse<ICollection<IEnvDataSample>>> port = 
-                new BasicPresenter<GenericDataResponse<ICollection<IEnvDataSample>>>();
-
-            DataAccessRequest<ICollection<IEnvDataSample>> request = new DataAccessRequest<ICollection<IEnvDataSample>>();
-            request.UserId = userId;
-
+            var port = new BasicPresenter<GenericDataResponse<IEnvDataSample>>();
+            var request = new DataAccessRequest<IEnvDataSample>
+            {
+                UserId = userId,
+                Strategy = DataAccessRequest<IEnvDataSample>.AcquisitionStrategy.All
+            };
             var success = await _sampleRetrieval.Handle(request, port);
+            return (success) ? new OkObjectResult(port.Response.Result.Select(SampleDto.From)) : BadRequest();
+        }
+        
+        [Authorize(Policy = PolicyNames.UserAccess)]
+        [HttpGet("slice")]
+        public async Task<IActionResult> GetSamples(string from, string to)
+        {
+            if (!ModelState.IsValid
+                || string.IsNullOrWhiteSpace(from)) return BadRequest(ModelState);
 
-            return (success) ? new OkObjectResult(port.Response) : BadRequest();
+            DateTime a, b;
+            try
+            {
+                a = DateTime.Parse(from);
+                b = (to != null) ? DateTime.Parse(to) : DateTime.MaxValue;
+            }
+            catch (Exception)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (a > b)
+            {
+                var tmp = a;
+                a = b;
+                b = tmp;
+            }
+            
+            var userId = _claimsCompat.ExtractFirstIdClaim(HttpContext.User);
+            var port = new BasicPresenter<GenericDataResponse<IEnvDataSample>>();
+            var request = new DataAccessRequest<IEnvDataSample>
+            {
+                UserId = userId,
+                Strategy = DataAccessRequest<IEnvDataSample>.AcquisitionStrategy.Range,
+                
+                // NOTE: ISTR having issues with DateTime static values not having the unspecified
+                // 'kind', as such we may have some issues with naive DateTimes here.
+                SelectionPredicate = (sample => InDateTimeRange(sample.Captured, a, b))
+            };
+            var success = await _sampleRetrieval.Handle(request, port);
+            return (success) ? new OkObjectResult(port.Response.Result.Select(SampleDto.From)) : BadRequest();
+        }
+
+        /// <summary>
+        /// if x is valid, converts all inputs to UTC and ensures that x is
+        /// somewhere in the inclusive range [a, b]
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns>True if x != null && a <= x <= b, false otherwise</returns>
+        private static bool InDateTimeRange(DateTime? x, DateTime a, DateTime b)
+        {
+            if (x == null) return false;
+
+            // Ensure all inputs are in UTC. (X should be, but doesn't hurt to scrub.)
+            x = x.Value.ToUniversalTime();
+            a = a.ToUniversalTime();
+            b = b.ToUniversalTime();
+            
+            return a <= x && x <= b;
         }
     }
 }

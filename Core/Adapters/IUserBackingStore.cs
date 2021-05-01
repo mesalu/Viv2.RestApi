@@ -1,11 +1,10 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Viv2.API.Core.ProtoEntities;
 
-namespace Viv2.API.Core.Services
+namespace Viv2.API.Core.Adapters
 {
     public interface IUserBackingStore
     {
@@ -72,8 +71,20 @@ namespace Viv2.API.Core.Services
         /// <returns></returns>
         Task<ICollection<IEnvironment>> LoadEnvironments([NotNull] IUser user, bool force = false);
 
+        /// <summary>
+        /// Backing implementations need not ensure that reference properties are loaded eagerly.
+        /// This method can be used to ensure that the RefreshTokens property is loaded - and back-assigned
+        /// to the user instance.
+        /// </summary>
         Task<ICollection<RefreshToken>> LoadRefreshTokens([NotNull] IUser user, bool force = false);
 
+        /// <summary>
+        /// Backing implementations need not ensure that reference properties are loaded eagerly.
+        /// This method can be used to ensure that the Pets property is loaded - and back-assigned
+        /// to the user instance.
+        /// </summary>
+        Task<ICollection<IPet>> LoadPets([NotNull] IUser user, bool force = false);
+        
         /// <summary>
         /// Persists an association between user and environment.
         /// </summary>

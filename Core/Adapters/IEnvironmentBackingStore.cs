@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Viv2.API.Core.ProtoEntities;
 
-namespace Viv2.API.Core.Services
+namespace Viv2.API.Core.Adapters
 {
     /// <summary>
     /// Store interface for interacting with environment data.
@@ -71,6 +71,17 @@ namespace Viv2.API.Core.Services
         /// <returns></returns>
         Task<IController> LoadControllerFor([NotNull] IEnvironment env, bool force = false);
 
+        /// <summary>
+        /// Loads, and assigns back to `env` if applicable, the pet occupying the environment.
+        ///
+        /// If the property appears to be loaded already, then this method may shortcut and return the currently loaded
+        /// property.
+        ///
+        /// To ensure up-to-date data, set force to true.
+        /// </summary>
+        /// <returns></returns>
+        Task<IPet> LoadPetFor([NotNull] IEnvironment env, bool force = false);
+        
         /// <summary>
         /// Adds the given sample to the backing data store.
         /// Does not ensure that current handles on Environment objects will be updated appropriately.

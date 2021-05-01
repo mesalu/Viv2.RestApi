@@ -14,6 +14,5 @@ namespace Viv2.API.AppInterface.Controllers
     [Route(RoutingStrings.BaseController)]
     public class NodeController : ControllerBase
     {
-        
     }
 }
