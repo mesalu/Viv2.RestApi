@@ -25,9 +25,9 @@ jobs:
 
     - name: Recompose deployment config
       env:
-        CONNECTION_STRING: ${{ secrets.PG_DB_CONNECTIONSTRING }}
-      run: |
-        sed -i "s/CONNECTION_STRING_PLACEHOLDER/$CONNECTION_STRING"
+        CONN_STR: ${{ secrets.PG_DB_CONNECTIONSTRING }}
+      shell: bash
+      run: sed -i 's/CONNECTION_STRING_PLACEHOLDER/'"${{ env.CONN_STR }}"'/g' AppInterface/appsettings.json;
 
     - name: Build with dotnet
       run: dotnet build --configuration Release
