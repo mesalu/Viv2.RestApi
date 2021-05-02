@@ -34,15 +34,15 @@ namespace Viv2.API.Core.UseCases
         public async Task<bool> Handle(LoginRequest message, IOutboundPort<LoginResponse> outputPort)
         {
             var user = await _userStore.GetUserByName(message.Username);
-            if (user == null) return false;
-
-            if (!await _userStore.CheckPassword(user, message.Password)) return false;
+            if (user == null 
+                || !await _userStore.CheckPassword(user, message.Password)) 
+                return false;
             
             var roles = await _userStore.GetRoles(user);
             var roleClaims = new List<Claim>();
             roleClaims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
                 
-            ClaimsIdentity identity = _claimsComposer.ComposeIdentity(user, roleClaims);
+            var identity = _claimsComposer.ComposeIdentity(user, roleClaims);
             var response = new LoginResponse
             {
                 UserName = user.Name,
