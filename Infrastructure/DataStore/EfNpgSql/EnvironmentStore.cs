@@ -87,7 +87,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
             var concrete = env as Environment;
             if (concrete == null) throw new ArgumentException("Mismatched datastore implementations");
             
-            await _context.Entry(concrete).Reference(e => e.Controller).LoadAsync();
+            await _context.Entry(concrete).Reference(e => e.RealController).LoadAsync();
             return env.Controller;
         }
 

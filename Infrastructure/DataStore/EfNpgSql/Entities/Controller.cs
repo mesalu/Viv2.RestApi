@@ -18,9 +18,13 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
         // what EF needs
         public ICollection<Environment> BackedEnvironments { get; set; }
         
+        public User RealOwner { get; set; }
+        
         // for abstraction
         [NotMapped]
         public ICollection<IEnvironment> Environments => 
             BackedEnvironments.Select(be => be as IEnvironment).ToList();
+
+        [NotMapped] public IUser Owner => RealOwner;
     }
 }

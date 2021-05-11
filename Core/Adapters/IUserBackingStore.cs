@@ -84,6 +84,16 @@ namespace Viv2.API.Core.Adapters
         /// to the user instance.
         /// </summary>
         Task<ICollection<IPet>> LoadPets([NotNull] IUser user, bool force = false);
+
+        /// <summary>
+        /// Backing implementations need not ensure that reference properties are loaded eagerly.
+        /// This method can be used to ensure that the Controllers property is loaded - and back-assigned
+        /// to the user instance.
+        ///
+        /// Note: every implementation of this method must load all environments associated
+        ///       to a controller for which the `user` can see.
+        /// </summary>
+        Task<ICollection<IController>> LoadControllers([NotNull] IUser user, bool force = false);
         
         /// <summary>
         /// Persists an association between user and environment.

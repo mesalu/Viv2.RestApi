@@ -14,10 +14,12 @@ namespace Viv2.API.Core.UseCases
     public class GetEnvironmentUseCase : IGetEnvironmentsUseCase
     {
         private readonly IUserBackingStore _userStore;
+        private readonly IEnvironmentBackingStore _envStore;
 
-        public GetEnvironmentUseCase(IUserBackingStore userStore)
+        public GetEnvironmentUseCase(IUserBackingStore userStore, IEnvironmentBackingStore envStore)
         {
             _userStore = userStore;
+            _envStore = envStore;
         }
             
         public async Task<bool> Handle(DataAccessRequest<IEnvironment> message, IOutboundPort<GenericDataResponse<IEnvironment>> outputPort)
@@ -29,6 +31,12 @@ namespace Viv2.API.Core.UseCases
                     var user = await _userStore.GetUserById(message.UserId);
                     if (user != null) await _userStore.LoadEnvironments(user);
                     var envs = user?.Environments;
+
+                    foreach (var env in envs)
+                    {
+                        await _envStore.LoadControllerFor(env);
+                        await _envStore.LoadPetFor(env);
+                    }
                     
                     // Compose a response.
                     var response = new GenericDataResponse<IEnvironment>

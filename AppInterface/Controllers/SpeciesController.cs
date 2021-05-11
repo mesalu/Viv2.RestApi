@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Viv2.API.AppInterface.Constants;
+using Viv2.API.AppInterface.Dto;
 using Viv2.API.AppInterface.Ports;
 using Viv2.API.Core.Constants;
 using Viv2.API.Core.Dto.Request;
@@ -51,7 +53,7 @@ namespace Viv2.API.AppInterface.Controllers
             var port = new BasicPresenter<GenericDataResponse<ISpecies>>();
             var success = await _getSpeciesData.Handle(request, port);
 
-            return (success) ? new OkObjectResult(port.Response.Result) : BadRequest();
+            return (success) ? new OkObjectResult(port.Response.Result.Select(SpeciesDto.From)) : BadRequest();
         }
     }
 }

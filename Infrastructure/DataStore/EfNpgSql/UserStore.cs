@@ -142,11 +142,36 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
             var collection = _context.Entry(backedUser).Collection(u => u.BackedPets);
             
             if (!force && collection.IsLoaded) return user.Pets;
-            
+
             await collection.LoadAsync();
             return user.Pets;
         }
-        
+
+        public async Task<ICollection<IController>> LoadControllers([NotNull] IUser user, bool force = false)
+        {
+            var backedUser = user as User;
+            if (backedUser == null) throw new ArgumentException("Datastore implementation mismatch.");
+            
+            // While there is some finickiness with loading environments & controllers,
+            // from the perspective of the userStore instance, we can always load
+            // all envs associated to a controller - IOW: a user that owns a controller
+            // can see all envs on that controller.
+            // (Note: a user that can see an env on a controller may not see all envs on
+            // said controller)
+            
+            // break the mold a bit - we need to include a nested collection too.
+            if (!force && user.Controllers.Count > 0) return user.Controllers;
+
+            var collection = await _context.Controllers
+                .Where(c => c.RealOwner == backedUser)
+                .Include(c => c.BackedEnvironments)
+                .ToListAsync();
+
+            backedUser.BackedControllers = collection;
+            
+            return user.Controllers;
+        }
+
         public async Task AddAssociationToEnv([NotNull] IUser user, [NotNull] IEnvironment environment)
         {
             if (!(user is User && environment is Environment)) 

@@ -16,5 +16,6 @@ namespace Viv2.API.Core.ProtoEntities
         public ICollection<RefreshToken> RefreshTokens { get; }
         public ICollection<IPet> Pets { get; }
         public ICollection<IEnvironment> Environments { get; }
+        public ICollection<IController> Controllers { get; }
     }
 }

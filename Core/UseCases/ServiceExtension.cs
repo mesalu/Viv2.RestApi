@@ -21,6 +21,7 @@ namespace Viv2.API.Core.UseCases
             services.AddTransient<IRegisterEnvironmentUseCase, RegisterEnvironmentUseCase>();
             services.AddTransient<IGetEnvironmentsUseCase, GetEnvironmentUseCase>();
             services.AddTransient<IGetSpeciesDataUseCase, GetSpeciesDataUseCase>();
+            services.AddTransient<IGetNodeControllerUseCase, GetNodeControllerUseCase>();
         }
     }
 }

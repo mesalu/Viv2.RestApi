@@ -13,6 +13,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
         {
             BackedPets = new HashSet<Pet>();
             BackedEnvironments = new HashSet<Environment>();
+            BackedControllers = new HashSet<Controller>();
             RefreshTokens = new HashSet<RefreshToken>();
         }
 
@@ -37,6 +38,8 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
         
         public virtual ICollection<Environment> BackedEnvironments { get; set; }
         
+        public virtual ICollection<Controller> BackedControllers { get; set; }
+        
         public virtual ICollection<RefreshToken> RefreshTokens { get; }
         
         // For abstraction compliance.
@@ -44,7 +47,11 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
         public ICollection<IPet> Pets => BackedPets.Select(p => p as IPet).ToList();
 
         [NotMapped]
-        public virtual ICollection<IEnvironment> Environments =>
+        public ICollection<IEnvironment> Environments =>
             BackedEnvironments.Select(e => e as IEnvironment).ToList();
+
+        [NotMapped]
+        public ICollection<IController> Controllers =>
+            BackedControllers.Select(c => c as IController).ToList();
     }
 }

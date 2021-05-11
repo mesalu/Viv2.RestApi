@@ -22,6 +22,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts
         public virtual DbSet<EnvDataSample> EnvDataSamples { get; set; }
         public virtual DbSet<Pet> Pets { get; set; }
         public virtual DbSet<Species> Species { get; set; }
+        public virtual DbSet<Controller> Controllers { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options)
             : base(options) { }
@@ -65,7 +66,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts
                 .Ignore(sample => sample.Environment)
                 .Property(e => e.Captured)
                 .HasDefaultValueSql("(NOW() AT TIME ZONE 'utc')");
-
+            
             // Ensure navigation property EnvDataSample.Occupant, which may not be caught implicitly.
             //modelBuilder.Entity<EnvDataSample>()
             //    .HasOne(eds => eds.Occupant);

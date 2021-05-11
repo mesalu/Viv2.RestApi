@@ -8,5 +8,6 @@ namespace Viv2.API.Core.ProtoEntities
         public Guid Id { get; set; }
 
         public ICollection<IEnvironment> Environments { get; }
+        public IUser Owner { get; } // every controller has precisely one owner. 
     }
 }

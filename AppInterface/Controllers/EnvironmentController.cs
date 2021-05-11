@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Viv2.API.AppInterface.Constants;
+using Viv2.API.AppInterface.Dto;
 using Viv2.API.AppInterface.Ports;
 using Viv2.API.Core.Adapters;
 using Viv2.API.Core.Constants;
@@ -96,7 +97,7 @@ namespace Viv2.API.AppInterface.Controllers
             if (success)
             {
                 var match = port.Response.Result.FirstOrDefault(e => e.Id == id);
-                if (match != null) return new OkObjectResult(match);
+                if (match != null) return new OkObjectResult(EnvironmentDto.From(match));
             }
 
             return BadRequest();

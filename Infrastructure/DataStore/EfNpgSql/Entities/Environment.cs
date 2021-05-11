@@ -18,7 +18,19 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
         }
         
         public Guid? Id { get; set; }
-        public IController? Controller { get; set; }
+        
+        public Controller? RealController { get; set; }
+        
+        [NotMapped]
+        public IController? Controller
+        {
+            get => RealController;
+            set
+            {
+                if (value is Controller controller) RealController = controller;
+                // else throw exception?
+            }
+        }
         
         // what EF needs
         public Pet? RealInhabitant { get; set; }

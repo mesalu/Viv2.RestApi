@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts;
@@ -9,9 +10,10 @@ using Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts;
 namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20210509003505_ControllerDirectAccess")]
+    partial class ControllerDirectAccess
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -256,21 +258,21 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("ControllerId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Descr")
                         .HasColumnType("text");
 
                     b.Property<string>("Model")
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("RealControllerId")
-                        .HasColumnType("uuid");
-
                     b.Property<int?>("RealInhabitantId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RealControllerId");
+                    b.HasIndex("ControllerId");
 
                     b.HasIndex("RealInhabitantId");
 
@@ -498,15 +500,13 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Migrations
 
             modelBuilder.Entity("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Environment", b =>
                 {
-                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Controller", "RealController")
+                    b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Controller", null)
                         .WithMany("BackedEnvironments")
-                        .HasForeignKey("RealControllerId");
+                        .HasForeignKey("ControllerId");
 
                     b.HasOne("Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Pet", "RealInhabitant")
                         .WithMany()
                         .HasForeignKey("RealInhabitantId");
-
-                    b.Navigation("RealController");
 
                     b.Navigation("RealInhabitant");
                 });
