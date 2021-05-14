@@ -44,7 +44,7 @@ namespace Viv2.API.Core.UseCases
                 },
                 RefreshToken = new RefreshToken
                 {
-                    Token = _minter.Mint(_claimsComposer.ComposeIdentity(user), TokenType.DaemonAccess),
+                    Token = _minter.Mint(_claimsComposer.ComposeIdentity(user), TokenType.Refresh),
                     ExpiresAt = (DateTime.UtcNow + TimeSpan.FromSeconds(_minter.Options.RefreshTokenLifespan)),
                     IssuedTo = user.Guid,
                     IssuedBy = Dns.GetHostName(),

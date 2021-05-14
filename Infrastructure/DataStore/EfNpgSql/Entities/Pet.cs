@@ -2,6 +2,8 @@ using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using Viv2.API.Core.ProtoEntities;
 
+#nullable enable
+
 namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
 {
     public class Pet : IPet
@@ -14,7 +16,8 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
         // what Core needs, but EF can't see.
         [NotMapped]
         public ISpecies Species 
-        { get => RealSpecies;
+        { 
+            get => RealSpecies;
             set
             {
                 if (value is Species species) RealSpecies = species;
@@ -25,6 +28,10 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
         
         [NotMapped]
         public IUser CareTaker => RealCareTaker;
+
+        public Environment RealEnclosure { get; set; }
+
+        [NotMapped] public IEnvironment? Enclosure => RealEnclosure;
 
         public string Name { get; set; }
         public string Morph { get; set; }

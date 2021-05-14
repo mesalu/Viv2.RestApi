@@ -26,16 +26,19 @@ namespace Viv2.API.AppInterface.Controllers
         private readonly IAddPetUseCase _addPetUseCase;
         private readonly IGetPetDataUseCase _getPetDataUseCase;
         private readonly IGetSamplesUseCase _sampleDataUseCase;
+        private readonly IMigratePetUseCase _migratePetUseCase;
         
         public PetController(IClaimIdentityCompat claimIdentityCompat,
             IAddPetUseCase addPetUseCase,
             IGetPetDataUseCase getPetDataUseCase,
-            IGetSamplesUseCase getSamplesUseCase)
+            IGetSamplesUseCase getSamplesUseCase,
+            IMigratePetUseCase migratePetUseCase)
         {
             _claimsCompat = claimIdentityCompat;
             _addPetUseCase = addPetUseCase;
             _getPetDataUseCase = getPetDataUseCase;
             _sampleDataUseCase = getSamplesUseCase;
+            _migratePetUseCase = migratePetUseCase;
         }
 
         [HttpGet("ids")]
@@ -170,5 +173,32 @@ namespace Viv2.API.AppInterface.Controllers
 
             return (success) ? new OkObjectResult(port.Response.Id) : BadRequest();
         }
+
+        /// <summary>
+        /// Migrate the pet specified by `id
+        ///
+        /// Note: the destination env must be empty or occupied by a
+        ///         pet that is directly owned by the active user.
+        /// </summary>
+        /// <param name="id">Id specifying the pet to migrate</param>
+        /// <param name="toEnv">Env Id specifying where to migrate the pet</param>
+        /// <returns></returns>
+        [HttpPost("{id}/migrate")]
+        public async Task<IActionResult> MigratePet(int id, Guid toEnv)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            
+            var request = new MigratePetRequest
+            {
+                UserId = _claimsCompat.ExtractFirstIdClaim(HttpContext.User),
+                PetId = id,
+                EnvId = toEnv
+            };
+
+            var port = new BasicPresenter<BlankResponse>();
+            var result = await _migratePetUseCase.Handle(request, port);
+
+            return (result) ? Ok() : BadRequest();
+        }        
     }
 }

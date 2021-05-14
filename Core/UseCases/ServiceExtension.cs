@@ -6,6 +6,10 @@ namespace Viv2.API.Core.UseCases
 {
     public static class ServiceExtension
     {
+        /// <summary>
+        /// Adds all "main path" use case implementations to the service collection.
+        /// </summary>
+        /// <param name="services"></param>
         public static void ApplyUseCases(this IServiceCollection services)
         {
             services.AddTransient<IAddSampleUseCase, AddSampleUseCase>();
@@ -22,6 +26,8 @@ namespace Viv2.API.Core.UseCases
             services.AddTransient<IGetEnvironmentsUseCase, GetEnvironmentUseCase>();
             services.AddTransient<IGetSpeciesDataUseCase, GetSpeciesDataUseCase>();
             services.AddTransient<IGetNodeControllerUseCase, GetNodeControllerUseCase>();
+            services.AddTransient<IMigratePetUseCase, MigratePetUseCase>();
+            services.AddTransient<IUpdateNodeUseCase, UpdateNodeUseCase>();
         }
     }
 }

@@ -1,6 +1,7 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using Viv2.API.Core.ProtoEntities;
+
+#nullable enable
 
 namespace Viv2.API.AppInterface.Dto
 {

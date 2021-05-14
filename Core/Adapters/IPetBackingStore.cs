@@ -52,5 +52,13 @@ namespace Viv2.API.Core.Adapters
         /// <param name="force">Force a reload</param>
         /// <returns></returns>
         public Task<IUser> LoadCareTaker([NotNull] IPet pet, bool force = false);
+
+        /// <summary>
+        /// Moves pet into environment, disassociating the past environment if any.
+        /// </summary>
+        /// <param name="pet"></param>
+        /// <param name="environment"></param>
+        /// <returns></returns>
+        public Task MigratePet([NotNull] IPet pet, [NotNull] IEnvironment environment);
     }
 }

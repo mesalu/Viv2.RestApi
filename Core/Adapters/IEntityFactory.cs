@@ -98,6 +98,11 @@ namespace Viv2.API.Core.Adapters
             ISpeciesBuilder SetLongitude(double lng);
         }
 
+        public interface IControllerBuilder : IEntityBuilder<IController>
+        {
+            IControllerBuilder SetId(Guid id);
+        }
+        
         /// <summary>
         /// Gets a new instance of a UserBuilder that the caller can use with impunity
         /// (Not a property for this reason)
@@ -134,5 +139,12 @@ namespace Viv2.API.Core.Adapters
         /// </summary>
         /// <returns></returns>
         ISpeciesBuilder GetSpeciesBuilder();
+
+        /// <summary>
+        /// Gets a new instance of IControllerBuilder that can be used with out conflict
+        /// NOTE: Builder specification does not ensure re-usability after a call to `Build`
+        /// </summary>
+        /// <returns></returns>
+        IControllerBuilder GetControllerBuilder();
     }
 }

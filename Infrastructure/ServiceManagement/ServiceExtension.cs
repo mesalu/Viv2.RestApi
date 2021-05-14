@@ -67,6 +67,7 @@ namespace Viv2.API.Infrastructure.ServiceManagement
             services.AddScoped<IUserBackingStore, UserStore>();
             services.AddScoped<IPetBackingStore, PetStore>();
             services.AddScoped<IEnvironmentBackingStore, EnvironmentStore>();
+            services.AddScoped<IControllerBackingStore, ControllerStore>();
 
             services.AddIdentity<User, IdentityRole>(options =>
                 {

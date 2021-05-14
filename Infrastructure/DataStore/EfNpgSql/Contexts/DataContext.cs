@@ -48,11 +48,14 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts
                 .Ignore(e => e.Controller)
                 .Ignore(e => e.Inhabitant)
                 .Ignore(e => e.EnvDataSamples)
-                .Ignore(e => e.Users);
+                .Ignore(e => e.Users)
+                .HasOne<Pet>(e => e.RealInhabitant)
+                .WithOne(p => p.RealEnclosure)
+                .HasForeignKey<Environment>(e => e.InhabitantId);
 
             modelBuilder.Entity<Pet>()
                 .Ignore(p => p.Species)
-                .Ignore(p => p.CareTaker);
+                .Ignore(p => p.CareTaker); 
 
             modelBuilder.Entity<Species>()
                 .Ignore(s => s.Pets);

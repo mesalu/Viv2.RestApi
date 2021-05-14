@@ -35,6 +35,12 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
         // what EF needs
         public Pet? RealInhabitant { get; set; }
         
+        /// <summary>
+        /// Used as the dependent relation on the current
+        /// one-to-one relationship between pets and enclosures. 
+        /// </summary>
+        public int? InhabitantId { get; set; }
+        
         // What Core needs
         [NotMapped]
         public IPet? Inhabitant 

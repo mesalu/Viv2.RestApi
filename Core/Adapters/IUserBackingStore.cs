@@ -102,5 +102,13 @@ namespace Viv2.API.Core.Adapters
         /// <param name="environment"></param>
         /// <returns></returns>
         Task AddAssociationToEnv([NotNull] IUser user, [NotNull] IEnvironment environment);
+
+        /// <summary>
+        /// Associates the given user to the given controller, persisting the association.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="controller"></param>
+        /// <returns></returns>
+        Task AddAssociationToController([NotNull] IUser user, [NotNull] IController controller);
     }
 }

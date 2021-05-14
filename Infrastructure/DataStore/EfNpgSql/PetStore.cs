@@ -8,6 +8,7 @@ using Viv2.API.Core.Adapters;
 using Viv2.API.Core.ProtoEntities;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities;
+using Environment = Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Environment;
 
 namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
 {
@@ -65,6 +66,24 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
             await _context.Entry(concrete).Reference(p => p.RealCareTaker).LoadAsync();
             
             return pet.CareTaker;
+        }
+
+        public async Task MigratePet([NotNull] IPet pet, IEnvironment environment)
+        {
+            var oldEnv = pet.Enclosure as Environment;
+
+            var concretePet = pet as Pet;
+            var concreteEnv = environment as Environment;
+            
+            if (concretePet == null) throw new ArgumentException("Mismatched infrastructure components");
+            
+            // Disassociate from pet. (TODO: correct when relationship changes to many pets per environment.)
+            if (oldEnv != null) oldEnv.Inhabitant = null;
+            
+            concretePet.RealEnclosure = environment as Environment;
+            if (concreteEnv != null) concreteEnv.RealInhabitant = concretePet;
+
+            await _context.SaveChangesAsync();
         }
     }
 }

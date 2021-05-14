@@ -198,6 +198,26 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
             await _context.SaveChangesAsync();
         }
 
+        public async Task AddAssociationToController([NotNull] IUser user, [NotNull] IController controller)
+        {
+            // ensure correct concrete types.
+            var concreteUser = user as User;
+            var concreteController = controller as Controller;
+
+            if (concreteController == null || concreteUser == null)
+                throw new ArgumentException("Infrastructure type mismatch");
+
+            concreteController.RealOwner = concreteUser;
+            if (await _context.Controllers.ContainsAsync(concreteController))
+                _context.Controllers.Update(concreteController);
+            else
+                await _context.Controllers.AddAsync(concreteController);
+            
+            
+            // commit to database.
+            await _context.SaveChangesAsync();
+        }
+        
         /// <summary>
         /// Creates a role via a RoleManager instance, should that role be missing.
         /// </summary>

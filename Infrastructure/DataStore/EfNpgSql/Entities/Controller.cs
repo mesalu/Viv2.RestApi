@@ -26,5 +26,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
             BackedEnvironments.Select(be => be as IEnvironment).ToList();
 
         [NotMapped] public IUser Owner => RealOwner;
+        
+        
     }
 }

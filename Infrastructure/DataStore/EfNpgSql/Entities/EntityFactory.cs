@@ -260,10 +260,35 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
             }
         }
 
+        private sealed class ControllerBuilder : IEntityFactory.IControllerBuilder
+        {
+            private readonly Controller _controller;
+
+            public ControllerBuilder()
+            {
+                _controller = new Controller();
+            }
+            
+            public IEntityFactory.IControllerBuilder SetId(Guid id)
+            {
+                _controller.Id = id;
+                return this;
+            }
+
+            public IController Build()
+            {
+                return new Controller
+                {
+                    Id = _controller.Id
+                };
+            }
+        }
+
         public IEntityFactory.IUserBuilder GetUserBuilder() => new UserBuilder();
         public IEntityFactory.IEnvBuilder GetEnvironmentBuilder() => new EnvBuilder();
         public IEntityFactory.IPetBuilder GetPetBuilder() => new PetBuilder();
         public IEntityFactory.ISampleBuilder GetSampleBuilder() => new SampleBuilder();
         public IEntityFactory.ISpeciesBuilder GetSpeciesBuilder() => new SpeciesBuilder();
+        public IEntityFactory.IControllerBuilder GetControllerBuilder() => new ControllerBuilder();
     }
 }

@@ -77,7 +77,7 @@ namespace Viv2.API.AppInterface.Controllers
             var port = new BasicPresenter<GenericDataResponse<IEnvironment>>();
             var success = await _getEnvironments.Handle(request, port);
 
-            return (success) ? new OkObjectResult(port.Response.Result.Select(e => e.Id).ToList()) : BadRequest();
+            return (success) ? new OkObjectResult(port.Response.Result.Select(EnvironmentDto.From).ToList()) : BadRequest();
         }
         
         [Authorize(Policy = PolicyNames.UserAccess)]
@@ -98,6 +98,7 @@ namespace Viv2.API.AppInterface.Controllers
             {
                 var match = port.Response.Result.FirstOrDefault(e => e.Id == id);
                 if (match != null) return new OkObjectResult(EnvironmentDto.From(match));
+                return NotFound();
             }
 
             return BadRequest();
