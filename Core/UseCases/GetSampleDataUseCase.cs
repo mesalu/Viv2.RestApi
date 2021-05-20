@@ -13,12 +13,12 @@ namespace Viv2.API.Core.UseCases
 {
     public class GetSampleDataUseCase : IGetSamplesUseCase
     {
-        private readonly IPetBackingStore _petStore;
-        private readonly IUserBackingStore _userStore;
-        private readonly IEnvironmentBackingStore _environmentStore;
+        private readonly IPetStore _petStore;
+        private readonly IUserStore _userStore;
+        private readonly IEnvironmentStore _environmentStore;
 
-        public GetSampleDataUseCase(IPetBackingStore petStore, IUserBackingStore userStore,
-            IEnvironmentBackingStore environmentStore)
+        public GetSampleDataUseCase(IPetStore petStore, IUserStore userStore,
+            IEnvironmentStore environmentStore)
         {
             _petStore = petStore;
             _userStore = userStore;

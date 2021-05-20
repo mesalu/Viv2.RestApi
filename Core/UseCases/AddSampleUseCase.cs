@@ -12,11 +12,11 @@ namespace Viv2.API.Core.UseCases
 {
     public class AddSampleUseCase : IAddSampleUseCase
     {
-        private readonly IUserBackingStore _userStore;
-        private readonly IEnvironmentBackingStore _envStore;
+        private readonly IUserStore _userStore;
+        private readonly IEnvironmentStore _envStore;
         private readonly IEntityFactory _entityFactory;
         
-        public AddSampleUseCase(IUserBackingStore userStore, IEnvironmentBackingStore envStore,
+        public AddSampleUseCase(IUserStore userStore, IEnvironmentStore envStore,
             IEntityFactory entityFactory)
         {
             _userStore = userStore;

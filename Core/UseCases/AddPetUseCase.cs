@@ -10,14 +10,14 @@ namespace Viv2.API.Core.UseCases
 {
     public class AddPetUseCase : IAddPetUseCase
     {
-        private readonly IUserBackingStore _userStore;
-        private readonly IPetBackingStore _backingStore;
+        private readonly IUserStore _userStore;
+        private readonly IPetStore _store;
         private readonly IEntityFactory _entityFactory;
 
-        public AddPetUseCase(IPetBackingStore backingStore, IEntityFactory entityFactory, IUserBackingStore userStore)
+        public AddPetUseCase(IPetStore store, IEntityFactory entityFactory, IUserStore userStore)
         {
             _userStore = userStore;
-            _backingStore = backingStore;
+            _store = store;
             _entityFactory = entityFactory;
         }
         public async Task<bool> Handle(CreatePetRequest message, IOutboundPort<NewEntityResponse<int>> outputPort)
@@ -28,12 +28,12 @@ namespace Viv2.API.Core.UseCases
             // Compose a new Pet instance:
             var pet = _entityFactory.GetPetBuilder()
                 .SetName(message.Name)
-                .SetSpecies(await _backingStore.GetSpeciesById(message.SpeciesType))
+                .SetSpecies(await _store.GetSpeciesById(message.SpeciesType))
                 .SetMorph(message.Morph)
                 .SetOwner(user)
                 .Build();
 
-            var id = await _backingStore.Create(pet);
+            var id = await _store.Create(pet);
             var response = new NewEntityResponse<int> { Id = id };
             outputPort.Handle(response);
             return true;

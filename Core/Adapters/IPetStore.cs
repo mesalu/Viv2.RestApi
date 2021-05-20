@@ -8,7 +8,7 @@ namespace Viv2.API.Core.Adapters
     /// <summary>
     /// An interface for describing all pet-data related operations that Core will depend on.
     /// </summary>
-    public interface IPetBackingStore
+    public interface IPetStore
     {
         /// <summary>
         /// Load all configured species out of persistent store.

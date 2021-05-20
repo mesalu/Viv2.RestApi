@@ -14,10 +14,10 @@ namespace Viv2.API.Core.UseCases
 {
     public class GetPetDataUseCase : IGetPetDataUseCase
     {
-        private readonly IUserBackingStore _userStore;
-        private readonly IPetBackingStore _petStore;
+        private readonly IUserStore _userStore;
+        private readonly IPetStore _petStore;
         
-        public GetPetDataUseCase(IPetBackingStore petStore, IUserBackingStore userStore)
+        public GetPetDataUseCase(IPetStore petStore, IUserStore userStore)
         {
             _userStore = userStore;
             _petStore = petStore;

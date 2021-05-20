@@ -12,14 +12,14 @@ namespace Viv2.API.Core.UseCases
 {
     public class UpdateNodeUseCase : IUpdateNodeUseCase
     {
-        private readonly IUserBackingStore _userStore;
-        private readonly IControllerBackingStore _controllerStore;
-        private readonly IEnvironmentBackingStore _environmentStore;
+        private readonly IUserStore _userStore;
+        private readonly IControllerStore _controllerStore;
+        private readonly IEnvironmentStore _environmentStore;
         private readonly IEntityFactory _entityFactory;
         
-        public UpdateNodeUseCase(IUserBackingStore userStore,
-            IControllerBackingStore controllerStore,
-            IEnvironmentBackingStore environmentStore,
+        public UpdateNodeUseCase(IUserStore userStore,
+            IControllerStore controllerStore,
+            IEnvironmentStore environmentStore,
             IEntityFactory entityFactory)
         {
             _userStore = userStore;

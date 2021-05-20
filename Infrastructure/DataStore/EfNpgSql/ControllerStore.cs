@@ -10,7 +10,7 @@ using Environment = Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Environm
 
 namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
 {
-    public class ControllerStore : IControllerBackingStore
+    public class ControllerStore : IControllerStore
     {
         private readonly DataContext _context;
 

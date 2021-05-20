@@ -13,10 +13,10 @@ namespace Viv2.API.Core.UseCases
 {
     public class GetEnvironmentUseCase : IGetEnvironmentsUseCase
     {
-        private readonly IUserBackingStore _userStore;
-        private readonly IEnvironmentBackingStore _envStore;
+        private readonly IUserStore _userStore;
+        private readonly IEnvironmentStore _envStore;
 
-        public GetEnvironmentUseCase(IUserBackingStore userStore, IEnvironmentBackingStore envStore)
+        public GetEnvironmentUseCase(IUserStore userStore, IEnvironmentStore envStore)
         {
             _userStore = userStore;
             _envStore = envStore;

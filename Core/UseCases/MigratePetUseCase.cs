@@ -10,10 +10,10 @@ namespace Viv2.API.Core.UseCases
 {
     public class MigratePetUseCase : IMigratePetUseCase
     {
-        private readonly IUserBackingStore _userStore;
-        private readonly IPetBackingStore _petStore;
+        private readonly IUserStore _userStore;
+        private readonly IPetStore _petStore;
 
-        public MigratePetUseCase(IUserBackingStore userStore, IPetBackingStore petStore)
+        public MigratePetUseCase(IUserStore userStore, IPetStore petStore)
         {
             _userStore = userStore;
             _petStore = petStore;

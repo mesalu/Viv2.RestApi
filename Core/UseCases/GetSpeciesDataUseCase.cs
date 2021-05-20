@@ -12,9 +12,9 @@ namespace Viv2.API.Core.UseCases
 {
     public class GetSpeciesDataUseCase : IGetSpeciesDataUseCase
     {
-        private readonly IPetBackingStore _petStore;
+        private readonly IPetStore _petStore;
 
-        public GetSpeciesDataUseCase(IPetBackingStore petStore)
+        public GetSpeciesDataUseCase(IPetStore petStore)
         {
             _petStore = petStore;
         }

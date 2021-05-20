@@ -6,7 +6,7 @@ using Viv2.API.Core.ProtoEntities;
 
 namespace Viv2.API.Core.Adapters
 {
-    public interface IUserBackingStore
+    public interface IUserStore
     {
         Task<IUser> GetUserByName(string name);
 

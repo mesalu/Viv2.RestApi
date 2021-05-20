@@ -13,7 +13,7 @@ using Environment = Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities.Environm
 
 namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
 {
-    public class UserStore : IUserBackingStore
+    public class UserStore : IUserStore
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;

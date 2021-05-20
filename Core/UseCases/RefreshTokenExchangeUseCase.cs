@@ -17,13 +17,13 @@ namespace Viv2.API.Core.UseCases
 {
     public class RefreshTokenExchangeUseCase : IRefreshTokenExchangeUseCase
     {
-        private readonly IUserBackingStore _backingStore;
+        private readonly IUserStore _store;
         private readonly ITokenMinter _minter;
         private readonly IClaimsComposer _claimsComposer;
         
-        public RefreshTokenExchangeUseCase(IUserBackingStore backingStore, ITokenMinter minter, IClaimsComposer claimsComposer)
+        public RefreshTokenExchangeUseCase(IUserStore store, ITokenMinter minter, IClaimsComposer claimsComposer)
         {
-            _backingStore = backingStore;
+            _store = store;
             _minter = minter;
             _claimsComposer = claimsComposer;
         }
@@ -31,10 +31,10 @@ namespace Viv2.API.Core.UseCases
         public async Task<bool> Handle(TokenExchangeRequest message, IOutboundPort<LoginResponse> outputPort)
         {
             // Verify user exists.
-            var user = await _backingStore.GetUserById(Guid.Parse(message.UserId));
+            var user = await _store.GetUserById(Guid.Parse(message.UserId));
             if (user == null) return false;
             
-            await _backingStore.LoadRefreshTokens(user);
+            await _store.LoadRefreshTokens(user);
             
             // Verify refresh token specified by message is associated to user.
             var persistedToken = user.RefreshTokens
@@ -42,7 +42,7 @@ namespace Viv2.API.Core.UseCases
 
             if (persistedToken == null) return false;
             
-            var roles = await _backingStore.GetRoles(user);
+            var roles = await _store.GetRoles(user);
             var roleClaims = new List<Claim>();
             roleClaims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
             

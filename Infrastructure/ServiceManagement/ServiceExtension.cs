@@ -64,10 +64,10 @@ namespace Viv2.API.Infrastructure.ServiceManagement
             services.AddDbContext<DataContext>(options => 
                 options.UseNpgsql(configuration.GetConnectionString("DataContextConnectionString")));
 
-            services.AddScoped<IUserBackingStore, UserStore>();
-            services.AddScoped<IPetBackingStore, PetStore>();
-            services.AddScoped<IEnvironmentBackingStore, EnvironmentStore>();
-            services.AddScoped<IControllerBackingStore, ControllerStore>();
+            services.AddScoped<IUserStore, UserStore>();
+            services.AddScoped<IPetStore, PetStore>();
+            services.AddScoped<IEnvironmentStore, EnvironmentStore>();
+            services.AddScoped<IControllerStore, ControllerStore>();
 
             services.AddIdentity<User, IdentityRole>(options =>
                 {

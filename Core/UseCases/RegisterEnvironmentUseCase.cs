@@ -14,12 +14,12 @@ namespace Viv2.API.Core.UseCases
 {
     public class RegisterEnvironmentUseCase : IRegisterEnvironmentUseCase
     {
-        private readonly IEnvironmentBackingStore _envStore;
-        private readonly IUserBackingStore _userStore;
+        private readonly IEnvironmentStore _envStore;
+        private readonly IUserStore _userStore;
         private readonly IEntityFactory _entityFactory;
 
-        public RegisterEnvironmentUseCase(IEnvironmentBackingStore envStore, 
-            IUserBackingStore userStore,
+        public RegisterEnvironmentUseCase(IEnvironmentStore envStore, 
+            IUserStore userStore,
             IEntityFactory entityFactory)
         {
             _envStore = envStore;

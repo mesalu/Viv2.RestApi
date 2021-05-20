@@ -9,7 +9,7 @@ namespace Viv2.API.Core.Adapters
     /// <summary>
     /// Store interface for interacting with environment data.
     /// </summary>
-    public interface IEnvironmentBackingStore
+    public interface IEnvironmentStore
     {
         /// <summary>
         /// Fetch an instance from the persisted store by id.

@@ -5,7 +5,7 @@ using Viv2.API.Core.ProtoEntities;
 
 namespace Viv2.API.Core.Adapters
 {
-    public interface IControllerBackingStore
+    public interface IControllerStore
     {
         /// <summary>
         /// Finds and returns an instance of IController that matches the given id.

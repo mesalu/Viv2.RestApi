@@ -20,11 +20,11 @@ namespace Viv2.API.Core.UseCases
     /// </summary>
     public class LoginUseCase : ILoginUseCase
     {
-        private readonly IUserBackingStore _userStore;
+        private readonly IUserStore _userStore;
         private readonly ITokenMinter _minter;
         private readonly IClaimsComposer _claimsComposer;
         
-        public LoginUseCase(IUserBackingStore userStore, ITokenMinter minter, IClaimsComposer claimsComposer)
+        public LoginUseCase(IUserStore userStore, ITokenMinter minter, IClaimsComposer claimsComposer)
         {
             _userStore = userStore;
             _minter = minter;

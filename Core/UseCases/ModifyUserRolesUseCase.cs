@@ -10,9 +10,9 @@ namespace Viv2.API.Core.UseCases
 {
     public class ModifyUserRolesUseCase : IModifyUserRolesUseCase
     {
-        private readonly IUserBackingStore _userStore;
+        private readonly IUserStore _userStore;
         
-        public ModifyUserRolesUseCase(IUserBackingStore userStore)
+        public ModifyUserRolesUseCase(IUserStore userStore)
         {
             _userStore = userStore;
         }

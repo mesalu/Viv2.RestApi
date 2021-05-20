@@ -10,9 +10,9 @@ namespace Viv2.API.Core.UseCases
 {
     public class GetNodeControllerUseCase : IGetNodeControllerUseCase
     {
-        private readonly IUserBackingStore _userStore;
+        private readonly IUserStore _userStore;
 
-        public GetNodeControllerUseCase(IUserBackingStore userStore)
+        public GetNodeControllerUseCase(IUserStore userStore)
         {
             _userStore = userStore;
         }

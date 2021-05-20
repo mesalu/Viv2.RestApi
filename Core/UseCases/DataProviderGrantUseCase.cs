@@ -14,13 +14,13 @@ namespace Viv2.API.Core.UseCases
 {
     public class DataProviderGrantUseCase : IDataProviderGrantUseCase
     {
-        private readonly IUserBackingStore _userStore;
+        private readonly IUserStore _userStore;
         private readonly ITokenMinter _minter;
         private readonly IClaimsComposer _claimsComposer;
 
-        public DataProviderGrantUseCase(IUserBackingStore backingStore, ITokenMinter minter, IClaimsComposer composer)
+        public DataProviderGrantUseCase(IUserStore store, ITokenMinter minter, IClaimsComposer composer)
         {
-            _userStore = backingStore;
+            _userStore = store;
             _minter = minter;
             _claimsComposer = composer;
         }

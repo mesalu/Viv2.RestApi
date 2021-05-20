@@ -11,9 +11,9 @@ namespace Viv2.API.Core.UseCases
     public class AddSpeciesUseCase : IAddSpeciesUseCase
     {
         private readonly IEntityFactory _entityFactory;
-        private readonly IPetBackingStore _petStore;
+        private readonly IPetStore _petStore;
 
-        public AddSpeciesUseCase(IEntityFactory factory, IPetBackingStore petStore)
+        public AddSpeciesUseCase(IEntityFactory factory, IPetStore petStore)
         {
             _entityFactory = factory;
             _petStore = petStore;

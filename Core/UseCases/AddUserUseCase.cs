@@ -10,19 +10,19 @@ namespace Viv2.API.Core.UseCases
 {
     public class AddUserUseCase : IAddUserUseCase
     {
-        private readonly IUserBackingStore _userBackingStore;
+        private readonly IUserStore _userStore;
         private readonly IEntityFactory _entityFactory;
 
-        public AddUserUseCase(IUserBackingStore backingStore, IEntityFactory entityFactory)
+        public AddUserUseCase(IUserStore store, IEntityFactory entityFactory)
         {
-            _userBackingStore = backingStore;
+            _userStore = store;
             _entityFactory = entityFactory;
         }
         
         public async Task<bool> Handle(CreateUserRequest message, IOutboundPort<NewUserResponse> outputPort)
         {
             // ensure username, email, are unused.
-            if (await _userBackingStore.GetUserByName(message.UserName) != null) return false;
+            if (await _userStore.GetUserByName(message.UserName) != null) return false;
             
             // create a new entity instance.
             var user = _entityFactory.GetUserBuilder()
@@ -30,7 +30,7 @@ namespace Viv2.API.Core.UseCases
                 .AddEmail(message.Email)
                 .Build();
             
-            var guid = await _userBackingStore.CreateUser(user, message.Password);
+            var guid = await _userStore.CreateUser(user, message.Password);
             
             // use backing store to persist.
             NewUserResponse response = new NewUserResponse();
