@@ -29,6 +29,5 @@ Global
 		{EFDE2505-CE2D-489A-A3BD-8DA48F96B931}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EFDE2505-CE2D-489A-A3BD-8DA48F96B931}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EFDE2505-CE2D-489A-A3BD-8DA48F96B931}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EFDE2505-CE2D-489A-A3BD-8DA48F96B931}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

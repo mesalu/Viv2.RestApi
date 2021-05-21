@@ -21,21 +21,22 @@ namespace Viv2.API.Infrastructure.DataStore.AzureBlob
         
         public async Task<Uri> GetBlobReadUri(string category, string blobName, long atLeast, long noLonger)
         {
-            var blobClient = _serviceClient.GetBlobContainerClient(category)?.GetBlobClient(blobName);
+            var containerClient = _serviceClient.GetBlobContainerClient(category);
+            await containerClient.CreateIfNotExistsAsync();
+            
+            var blobClient = containerClient.GetBlobClient(blobName);
             if (blobClient != null && blobClient.CanGenerateSasUri)
                 return blobClient.GenerateSasUri(BlobSasPermissions.Read, DateTimeOffset.UtcNow.AddSeconds(atLeast));
-#if DEBUG
-            return null;
-#else
+
             // Try to compose a SAS token by getting a delegate key
             if (_delegationKey == null || _delegationKey.SignedExpiresOn < DateTime.UtcNow)
                 await UpdateDelegationKey();
             
             // Create a new Sas uri & return it.
-            BlobSasBuilder sasBuilder = new BlobSasBuilder()
+            var sasBuilder = new BlobSasBuilder()
             {
-                BlobContainerName = blobClient.BlobContainerName,
-                BlobName = blobClient.Name,
+                BlobContainerName = category,
+                BlobName = blobName,
                 Resource = "b",
                 StartsOn = DateTimeOffset.UtcNow,
                 ExpiresOn = DateTimeOffset.UtcNow.AddSeconds(atLeast)
@@ -49,7 +50,6 @@ namespace Viv2.API.Infrastructure.DataStore.AzureBlob
             };
 
             return blobUriBuilder.ToUri();
-#endif
         }
 
         public async Task WriteBlob(string category, string blobName, string mimeType, Stream contentStream)
