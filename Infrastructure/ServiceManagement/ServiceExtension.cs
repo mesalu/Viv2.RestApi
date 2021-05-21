@@ -1,13 +1,17 @@
 ﻿using System;
+using Azure.Identity;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Viv2.API.Core.Adapters;
 using Viv2.API.Core.ConfigModel;
 using Viv2.API.Core.Constants;
+using Viv2.API.Infrastructure.DataStore.AzureBlob;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities;
@@ -50,7 +54,7 @@ namespace Viv2.API.Infrastructure.ServiceManagement
         /// <param name="type"></param>
         /// <param name="configuration">A handle on the application configuration, where information for
         /// the pertinent data backing policy can be found (such as connection strings)</param>
-        public static void AddDataStore(this IServiceCollection services, BackingStoreTypes type, IConfiguration configuration)
+        public static void AddRelationalDataStore(this IServiceCollection services, BackingStoreTypes type, IConfiguration configuration)
         {
             if (type != BackingStoreTypes.EfIdent) throw new NotImplementedException();
             
@@ -80,6 +84,23 @@ namespace Viv2.API.Infrastructure.ServiceManagement
                     options.User.RequireUniqueEmail = true;
                 })
                 .AddEntityFrameworkStores<DataContext>();
+        }
+
+        public static void AddBlobDataStore(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddScoped<IBlobStore, BlobStore>();
+            
+#if DEBUG
+            var azuriteConnectionString = "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;";
+            var serviceClient = new BlobServiceClient(azuriteConnectionString);
+            services.AddSingleton(serviceClient);
+#else
+            services.AddAzureClients(builder =>
+            {
+                builder.AddBlobServiceClient(configuration.GetSection("BlobStorage"));
+                builder.UseCredential(new DefaultAzureCredential());
+            });
+#endif
         }
 
         private static void _ConfigureForJwtAuth(IServiceCollection services, 

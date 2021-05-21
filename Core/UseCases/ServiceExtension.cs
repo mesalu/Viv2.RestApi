@@ -28,6 +28,9 @@ namespace Viv2.API.Core.UseCases
             services.AddTransient<IGetNodeControllerUseCase, GetNodeControllerUseCase>();
             services.AddTransient<IMigratePetUseCase, MigratePetUseCase>();
             services.AddTransient<IUpdateNodeUseCase, UpdateNodeUseCase>();
+            services.AddTransient<IBlobAccessUseCase, BlobAccessUseCase>();
+            services.AddTransient<IPetImageUseCase, PetImageUseCase>();
+            services.AddTransient<IPetImageUseCase, PetImageUseCase>();
         }
     }
 }

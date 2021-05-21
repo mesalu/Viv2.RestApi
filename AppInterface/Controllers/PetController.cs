@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,18 +26,21 @@ namespace Viv2.API.AppInterface.Controllers
         private readonly IGetPetDataUseCase _getPetDataUseCase;
         private readonly IGetSamplesUseCase _sampleDataUseCase;
         private readonly IMigratePetUseCase _migratePetUseCase;
+        private readonly IPetImageUseCase _imageUseCase;
         
         public PetController(IClaimIdentityCompat claimIdentityCompat,
             IAddPetUseCase addPetUseCase,
             IGetPetDataUseCase getPetDataUseCase,
             IGetSamplesUseCase getSamplesUseCase,
-            IMigratePetUseCase migratePetUseCase)
+            IMigratePetUseCase migratePetUseCase,
+            IPetImageUseCase imageUseCase)
         {
             _claimsCompat = claimIdentityCompat;
             _addPetUseCase = addPetUseCase;
             _getPetDataUseCase = getPetDataUseCase;
             _sampleDataUseCase = getSamplesUseCase;
             _migratePetUseCase = migratePetUseCase;
+            _imageUseCase = imageUseCase;
         }
 
         [HttpGet("ids")]
@@ -199,6 +201,54 @@ namespace Viv2.API.AppInterface.Controllers
             var result = await _migratePetUseCase.Handle(request, port);
 
             return (result) ? Ok() : BadRequest();
-        }        
+        }
+
+        [HttpPut("{id}/image")]
+        public async Task<IActionResult> UpdateProfileImage(int id)
+        {
+            // Ensure content type is supported 
+            // TODO: look at applying some sort of 'upstream' filter on this instead of checking here.
+            //       (it'll probably help with preflight requests and the like)
+            var supportedMimeTypes = new string[] {"image/png", "image/jpeg"};
+            if (!supportedMimeTypes.Any(x => x.Equals(Request.ContentType))) 
+                return new UnsupportedMediaTypeResult();
+            
+            var request = new PetImageRequest
+            {
+                Update = true,
+                UserId = _claimsCompat.ExtractFirstIdClaim(HttpContext.User),
+                PetId = id,
+                Content = Request.Body,
+                MimeType = Request.ContentType
+            };
+
+            var port = new BasicPresenter<BlobUriResponse>();
+
+            var success = await _imageUseCase.Handle(request, port);
+            if (success)
+                return new OkObjectResult(port.Response)
+                {
+                    StatusCode = 201
+                };
+
+            return BadRequest();
+        }
+
+        [HttpGet("{id}/image")]
+        public async Task<IActionResult> GetPetImage(int id)
+        {
+            var request = new PetImageRequest
+            {
+                Update = false,
+                UserId = _claimsCompat.ExtractFirstIdClaim(HttpContext.User),
+                PetId = id,
+                Content = null
+            };
+
+            var port = new BasicPresenter<BlobUriResponse>();
+
+            var success = await _imageUseCase.Handle(request, port);
+            return (success) ? new OkObjectResult(port.Response) : NotFound();
+        }
     }
 }

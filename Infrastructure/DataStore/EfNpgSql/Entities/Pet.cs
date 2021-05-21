@@ -31,8 +31,19 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
 
         public Environment RealEnclosure { get; set; }
 
-        [NotMapped] public IEnvironment? Enclosure => RealEnclosure;
+        [NotMapped] 
+        public IEnvironment? Enclosure => RealEnclosure;
 
+        // Concrete
+        public BlobRecord ProfileRecordEntity { get; set; }
+
+        // abstract
+        [NotMapped] 
+        public IBlobRecord? ProfileImage => ProfileRecordEntity;
+
+        // TODO: maintain a many-to-many with past profile pictures?
+        //  may be worthwhile even if just for record keeping.
+        
         public string Name { get; set; }
         public string Morph { get; set; }
         public DateTime? HatchDate { get; set; }

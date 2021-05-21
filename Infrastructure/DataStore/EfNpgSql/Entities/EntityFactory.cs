@@ -283,6 +283,36 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
                 };
             }
         }
+        
+        private sealed class BlobRecordBuilder : IEntityFactory.IBlobRecordBuilder
+        {
+            private readonly BlobRecord _blobRecord;
+
+            public BlobRecordBuilder()
+            {
+                _blobRecord = new BlobRecord();
+            }
+            public IEntityFactory.IBlobRecordBuilder SetCategory(string category)
+            {
+                _blobRecord.Category = category;
+                return this;
+            }
+
+            public IEntityFactory.IBlobRecordBuilder SetName(string blobName)
+            {
+                _blobRecord.BlobName = blobName;
+                return this;
+            }
+
+            public IBlobRecord Build()
+            {
+                return new BlobRecord
+                {
+                    Category = _blobRecord.Category,
+                    BlobName = _blobRecord.BlobName,
+                };
+            }
+        } 
 
         public IEntityFactory.IUserBuilder GetUserBuilder() => new UserBuilder();
         public IEntityFactory.IEnvBuilder GetEnvironmentBuilder() => new EnvBuilder();
@@ -290,5 +320,6 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
         public IEntityFactory.ISampleBuilder GetSampleBuilder() => new SampleBuilder();
         public IEntityFactory.ISpeciesBuilder GetSpeciesBuilder() => new SpeciesBuilder();
         public IEntityFactory.IControllerBuilder GetControllerBuilder() => new ControllerBuilder();
+        public IEntityFactory.IBlobRecordBuilder GetBlobRecordBuilder() => new BlobRecordBuilder();
     }
 }

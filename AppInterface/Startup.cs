@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,18 +32,17 @@ namespace Viv2.API.AppInterface
             /* TODO: These functions un-"onion" the project (imposes a dependency through core)
              *       so ideally we want to find a better way to do this.
              */
-            services.AddDataStore(BackingStoreTypes.EfIdent, Configuration);
+            services.AddRelationalDataStore(BackingStoreTypes.EfIdent, Configuration);
             services.AddTokenAuth(TokenMinterTypes.JWS, Configuration);
+            services.AddBlobDataStore(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
-
+            
             app.UseRequestLogging();
             app.UseHttpsRedirection();
 

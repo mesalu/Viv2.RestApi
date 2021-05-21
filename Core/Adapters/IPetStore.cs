@@ -54,11 +54,27 @@ namespace Viv2.API.Core.Adapters
         public Task<IUser> LoadCareTaker([NotNull] IPet pet, bool force = false);
 
         /// <summary>
+        /// Loads the ProfileImage reference of the specified pet.
+        /// </summary>
+        /// <param name="pet"></param>
+        /// <param name="force">Force a reload</param>
+        /// <returns></returns>
+        public Task<IBlobRecord> LoadImageRecord([NotNull] IPet pet, bool force = false);
+        
+        /// <summary>
         /// Moves pet into environment, disassociating the past environment if any.
         /// </summary>
         /// <param name="pet"></param>
         /// <param name="environment"></param>
         /// <returns></returns>
         public Task MigratePet([NotNull] IPet pet, [NotNull] IEnvironment environment);
+
+        /// <summary>
+        /// Updates the image entry for the given pet to the given blob record.
+        /// </summary>
+        /// <param name="pet"></param>
+        /// <param name="imageRecord"></param>
+        /// <returns></returns>
+        public Task UpdateImage([NotNull] IPet pet, [NotNull] IBlobRecord imageRecord);
     }
 }

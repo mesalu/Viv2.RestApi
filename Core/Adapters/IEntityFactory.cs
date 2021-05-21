@@ -102,6 +102,12 @@ namespace Viv2.API.Core.Adapters
         {
             IControllerBuilder SetId(Guid id);
         }
+
+        public interface IBlobRecordBuilder : IEntityBuilder<IBlobRecord>
+        {
+            IBlobRecordBuilder SetCategory(string category);
+            IBlobRecordBuilder SetName(string blobName);
+        }
         
         /// <summary>
         /// Gets a new instance of a UserBuilder that the caller can use with impunity
@@ -146,5 +152,12 @@ namespace Viv2.API.Core.Adapters
         /// </summary>
         /// <returns></returns>
         IControllerBuilder GetControllerBuilder();
+
+        /// <summary>
+        /// Gets a new instance of IBlobEntryBuilder that can be used with out conflict.
+        /// NOTE: Builder specification does not ensure re-usability after a call to `Build`.
+        /// </summary>
+        /// <returns></returns>
+        IBlobRecordBuilder GetBlobRecordBuilder();
     }
 }
