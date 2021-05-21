@@ -67,8 +67,8 @@ namespace Viv2.API.Core.UseCases
             
             var response = new BlobUriResponse
             {
-                Uri = await _blobStore.GetBlobReadUri(category, blobName, 60, 60),
-                ExpiresIn = 60
+                Uri = await _blobStore.GetBlobReadUri(category, blobName, 10, 30),
+                ExpiresIn = 10
             };
             
             outputPort.Handle(response);

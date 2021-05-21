@@ -248,7 +248,7 @@ namespace Viv2.API.AppInterface.Controllers
             var port = new BasicPresenter<BlobUriResponse>();
 
             var success = await _imageUseCase.Handle(request, port);
-            return (success) ? new OkObjectResult(port.Response) : NotFound();
+            return (success) ? new RedirectResult(port.Response.Uri.ToString()) : NotFound();
         }
     }
 }

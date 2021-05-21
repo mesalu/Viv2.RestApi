@@ -91,6 +91,7 @@ namespace Viv2.API.Infrastructure.ServiceManagement
             services.AddScoped<IBlobStore, BlobStore>();
             
 #if DEBUG
+            // Connect to local storage in debug mode.
             var azuriteConnectionString = "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;";
             var serviceClient = new BlobServiceClient(azuriteConnectionString);
             services.AddSingleton(serviceClient);

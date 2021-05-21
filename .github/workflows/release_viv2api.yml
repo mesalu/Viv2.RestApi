@@ -23,11 +23,17 @@ jobs:
       with:
         dotnet-version: '5.0.x'
 
-    - name: Recompose deployment config
+    - name: Substitue RDBMS connection string
       env:
         CONN_STR: ${{ secrets.PG_DB_CONNECTIONSTRING }}
       shell: bash
       run: sed -i 's/CONNECTION_STRING_PLACEHOLDER/'"${{ env.CONN_STR }}"'/g' AppInterface/appsettings.json;
+
+    - name: Substitute Blob Storage URI
+      env:
+        BLOB_URI: ${{ secrets.BLOB_STORAGE_URI}}
+      shell: bash
+      run: sed -i 's/BLOB_SERVICE_URI_PLACEHOLDER/'"${{ env.BLOB_URI }}"'/g' AppInterface/appsettings.json;
 
     - name: Build with dotnet
       run: dotnet build --configuration Release
