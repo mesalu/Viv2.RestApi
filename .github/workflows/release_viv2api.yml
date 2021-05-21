@@ -29,9 +29,9 @@ jobs:
       shell: bash
       run: sed -i 's/CONNECTION_STRING_PLACEHOLDER/'"${{ env.CONN_STR }}"'/g' AppInterface/appsettings.json;
 
-    - name: Substitute Blob Storage URI
+    - name: Substitue Blob storage URI
       env:
-        BLOB_URI: ${{ secrets.BLOB_STORAGE_URI}}
+        BLOB_URI: ${{ secrets.BLOB_STORAGE_URI }}
       shell: bash
       run: sed -i 's/BLOB_SERVICE_URI_PLACEHOLDER/'"${{ env.BLOB_URI }}"'/g' AppInterface/appsettings.json;
 
