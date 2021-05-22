@@ -56,8 +56,16 @@ namespace Viv2.API.Infrastructure.DataStore.AzureBlob
         {
             var blobClient = _serviceClient.GetBlobContainerClient(category)?.GetBlobClient(blobName);
             if (blobClient == null) return;
+
+            var headers = new BlobHttpHeaders
+            {
+                // always set caching to be fairly lenient. Clients can clear cache if it becomes an issue.
+                CacheControl = "max-age=3600"
+            };
             
-            var headers = (mimeType != null) ? new BlobHttpHeaders { ContentType = mimeType } : null;
+            // conditionally set content type
+            if (mimeType != null) headers.ContentType = mimeType;
+            
             await blobClient.UploadAsync(contentStream, headers);
         }
 
