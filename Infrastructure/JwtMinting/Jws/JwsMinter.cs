@@ -41,7 +41,7 @@ namespace Viv2.API.Infrastructure.JwtMinting.Jws
             RequireAudience = true,
             RequireSignedTokens = true,
             IssuerSigningKey = _securityKey,
-            ValidIssuer = Options.Issuer,
+            ValidIssuer = Options.Issuer
         };
         
         public string Mint(ClaimsIdentity identity, TokenType type)
@@ -88,7 +88,7 @@ namespace Viv2.API.Infrastructure.JwtMinting.Jws
                 Options.Issuer,
                 claims: claims,
                 notBefore: DateTime.UtcNow,
-                expires: DateTime.UtcNow.Add(TimeSpan.FromSeconds(Options.RefreshTokenLifespan)),
+                expires: DateTime.UtcNow.Add(TimeSpan.FromSeconds(Options.TokenLifespan)),
                 signingCredentials: _signingCredentials
             );
             
