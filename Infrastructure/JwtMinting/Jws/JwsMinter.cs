@@ -41,7 +41,8 @@ namespace Viv2.API.Infrastructure.JwtMinting.Jws
             RequireAudience = true,
             RequireSignedTokens = true,
             IssuerSigningKey = _securityKey,
-            ValidIssuer = Options.Issuer
+            ValidIssuer = Options.Issuer,
+            ClockSkew = TimeSpan.FromSeconds(15) 
         };
         
         public string Mint(ClaimsIdentity identity, TokenType type)
