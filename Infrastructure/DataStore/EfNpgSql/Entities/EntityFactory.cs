@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Internal;
 using Viv2.API.Core.Adapters;
 using Viv2.API.Core.ProtoEntities;
 
@@ -201,7 +203,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
 
             public IEnvDataSample Build()
             {
-                return new EnvDataSample
+                return new EnvDataSample()
                 {
                     Environment = _sample.Environment,
                     Occupant = _sample.Occupant,
@@ -312,8 +314,8 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
                     BlobName = _blobRecord.BlobName,
                 };
             }
-        } 
-
+        }
+        
         public IEntityFactory.IUserBuilder GetUserBuilder() => new UserBuilder();
         public IEntityFactory.IEnvBuilder GetEnvironmentBuilder() => new EnvBuilder();
         public IEntityFactory.IPetBuilder GetPetBuilder() => new PetBuilder();
