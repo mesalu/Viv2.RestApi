@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Viv2.API.Core.ProtoEntities;
 
 #nullable enable
@@ -8,8 +9,21 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
 {
     public class EnvDataSample : IEnvDataSample
     {
-        public int Id { get; set; }
+        private Pet? _realOccupant;
+
+        public EnvDataSample()
+        {
+            _realOccupant = null;
+        }
+        public EnvDataSample(ILazyLoader lazyLoader)
+        {
+            LazyLoader = lazyLoader;
+        }
+        private ILazyLoader? LazyLoader { get; set; }
+
         
+        public int Id { get; set; }
+
         // What Core accesses
         [NotMapped]
         public IEnvironment? Environment 
@@ -40,7 +54,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
         }
 
         // what EF needs
-        public Pet? RealOccupant { get; set; }
+        public Pet? RealOccupant { get => LazyLoader?.Load(this, ref _realOccupant); set => _realOccupant = value; }
 
         private DateTime? _captured;
         public DateTime? Captured

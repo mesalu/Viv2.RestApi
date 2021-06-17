@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Azure.Identity;
 using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -88,7 +89,7 @@ namespace Viv2.API.Infrastructure.ServiceManagement
 
         public static void AddBlobDataStore(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<IBlobStore, BlobStore>();
+            services.AddScoped<IBlobStore, DataStore.AzureBlob.BlobStore>();
             
 #if DEBUG
             // Connect to local storage in debug mode.
