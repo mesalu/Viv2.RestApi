@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -250,47 +249,6 @@ namespace Viv2.API.AppInterface.Controllers
 
             var success = await _imageUseCase.Handle(request, port);
             return (success) ? new RedirectResult(port.Response.Uri.ToString()) : NotFound();
-        }
-
-        /// <summary>
-        /// Fetches the env samples that are associated to the specified pet by ID
-        /// within the range [start, end)
-        /// </summary>
-        /// <param name="id">The Pet ID whose samples are being fetched</param>
-        /// <param name="start">start of the capture time range, inclusive</param>
-        /// <param name="end">end of the capture time range, exclusive</param>
-        /// <returns></returns>
-        [HttpGet("{id}/samples")]
-        public async Task<IActionResult> GetSamplesPage(int id, DateTime start, DateTime end)
-        {
-            if (start.Equals(DateTime.MinValue) || end.Equals(DateTime.MinValue)) return BadRequest(ModelState);
-
-            if (end < start)
-            {
-                var tmp = start;
-                start = end;
-                end = tmp;
-            }
-            
-            var request = new DataAccessRequest<IEnvDataSample>()
-            {
-                UserId = _claimsCompat.ExtractFirstIdClaim(HttpContext.User),
-                Strategy = DataAccessRequest<IEnvDataSample>.AcquisitionStrategy.Range,
-                SelectionPredicate = sample =>
-                {
-                    var captureTime = sample.Captured;
-                    var gteStart = start <= captureTime;
-                    var ltEnd = captureTime < end;
-                    var matchingPet = sample.Occupant?.Id == id;
-                    return matchingPet && gteStart && ltEnd;
-                }
-            };
-
-            var port = new BasicPresenter<GenericDataResponse<IEnvDataSample>>();
-            var success = await _sampleDataUseCase.Handle(request, port);
-
-            if (!success) return BadRequest();
-            return new OkObjectResult(port.Response.Result.Select(SampleDto.From));
         }
     }
 }
