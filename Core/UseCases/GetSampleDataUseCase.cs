@@ -11,6 +11,7 @@ using Viv2.API.Core.ProtoEntities;
 
 namespace Viv2.API.Core.UseCases
 {
+    [Obsolete("Use SampleAcquisitionUseCase instead.")]
     public class GetSampleDataUseCase : IGetSamplesUseCase
     {
         private readonly IPetStore _petStore;
