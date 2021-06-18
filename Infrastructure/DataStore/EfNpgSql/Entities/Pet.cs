@@ -31,7 +31,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
         public BlobRecord ProfileRecordEntity { get; set; }
         public EnvDataSample? LatestConcreteSample
         {
-            get => LazyLoader?.Load(this, ref _latestConcreteSample);
+            get => LazyLoader?.Load(this, ref _latestConcreteSample) ?? _latestConcreteSample;
             set => _latestConcreteSample = value;
         }
         

@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Viv2.API.Core.ProtoEntities;
 
 #nullable enable
@@ -36,7 +37,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
         public Environment? RealEnvironment { get; set; }
         public Pet? RealOccupant 
         { 
-            get => LazyLoader?.Load(this, ref _realOccupant);
+            get => LazyLoader?.Load(this, ref _realOccupant) ?? _realOccupant;
             set => _realOccupant = value;
         }
         public double HotGlass { get; set; }

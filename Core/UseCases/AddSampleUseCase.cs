@@ -50,9 +50,9 @@ namespace Viv2.API.Core.UseCases
                 .Build();
 
             await _envStore.AddSample(sample);
-
-            if (sample.Occupant != null)
-                await _petStore.UpdateLatestSample(sample.Occupant, sample);
+            
+            if (env.Inhabitant != null)
+                await _petStore.UpdateLatestSample(env.Inhabitant, sample);
             
             return true;
         }
