@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Viv2.API.Core.ProtoEntities;
 
 #nullable enable
@@ -8,9 +9,45 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
 {
     public class EnvDataSample : IEnvDataSample
     {
-        public int Id { get; set; }
+        private ILazyLoader LazyLoader;
+        private Pet? _realOccupant;
+        public EnvDataSample() {}
+
+        public EnvDataSample(ILazyLoader lazyLoader)
+        {
+            LazyLoader = lazyLoader;
+        }
         
-        // What Core accesses
+        private DateTime? _captured;
+        
+        // Properties discoverable by EF Core that utilize concrete classes to define relations.
+        public long Id { get; set; }
+        public DateTime? Captured
+        {
+            // NOTE: this property has been specially configured in DataContext to be used when materializing
+            //       otherwise we wouldn't be able to rely on the setter to achieve the desired effect. 
+            get => _captured;
+            set
+            {
+                // Convert unspecified / naive date time instances to UTC.
+                if (value.HasValue && value.Value.Kind == DateTimeKind.Unspecified)
+                    _captured = DateTime.SpecifyKind(value.Value, DateTimeKind.Utc);
+            }
+        }
+        public Environment? RealEnvironment { get; set; }
+        public Pet? RealOccupant 
+        { 
+            get => LazyLoader?.Load(this, ref _realOccupant) ?? _realOccupant;
+            set => _realOccupant = value;
+        }
+        public double HotGlass { get; set; }
+        public double HotMat { get; set; }
+        public double MidGlass { get; set; }
+        public double ColdGlass { get; set; }
+        public double ColdMat { get; set; }
+        
+        // All the hidden abstraction implementations (fulfillment of the Core interface that don't play
+        // too nicely with EF Core.) 
         [NotMapped]
         public IEnvironment? Environment 
         { 
@@ -22,11 +59,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
                 else throw new ArgumentException("Mismatched infrastructure data store backings");
             } 
         }
-        
-        // what EF needs.
-        public Environment? RealEnvironment { get; set; }
-        
-        // what Core needs
+
         [NotMapped]
         public IPet? Occupant
         {
@@ -38,30 +71,5 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
                 else throw new ArgumentException("Mismatched infrastructure data store backings");
             }
         }
-
-        // what EF needs
-        public Pet? RealOccupant { get; set; }
-
-        private DateTime? _captured;
-        public DateTime? Captured
-        {
-            get
-            {
-                if (_captured.HasValue && _captured.Value.Kind == DateTimeKind.Unspecified)
-                    // Part of Core's spec to Infrastructure providers is that all date time values are UTC.
-                    // NpgSql is somewhat timezone aware but it appears that postgres is still treating datetime
-                    // objects naively, so correct for that here.
-                    return DateTime.SpecifyKind(_captured.Value, DateTimeKind.Utc);
-                
-                return _captured;
-            }
-            set => _captured = value;
-        }
-        
-        public double HotGlass { get; set; }
-        public double HotMat { get; set; }
-        public double MidGlass { get; set; }
-        public double ColdGlass { get; set; }
-        public double ColdMat { get; set; }
     }
 }

@@ -17,6 +17,14 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
             RefreshTokens = new HashSet<RefreshToken>();
         }
 
+        // Properties visible to EF that use concrete classes to define relationships
+        public ICollection<Pet> BackedPets { get; set; }
+        public ICollection<Environment> BackedEnvironments { get; set; }
+        public ICollection<Controller> BackedControllers { get; set; }
+        public ICollection<RefreshToken> RefreshTokens { get; }
+
+        // Abstraction fulfillment - hidden from EF.
+        [NotMapped]
         public string Name
         {
             get => UserName;
@@ -32,17 +40,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
                 if (value != Guid.Empty) Id = value.ToString();
             } 
         }
-
-        // For actual mapping to entities.
-        public virtual ICollection<Pet> BackedPets { get; set; }
         
-        public virtual ICollection<Environment> BackedEnvironments { get; set; }
-        
-        public virtual ICollection<Controller> BackedControllers { get; set; }
-        
-        public virtual ICollection<RefreshToken> RefreshTokens { get; }
-        
-        // For abstraction compliance.
         [NotMapped]
         public ICollection<IPet> Pets => BackedPets.Select(p => p as IPet).ToList();
 

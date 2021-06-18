@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Viv2.API.Core.ProtoEntities;
 
 #nullable enable
@@ -8,12 +9,33 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
 {
     public class Pet : IPet
     {
+        private EnvDataSample? _latestConcreteSample;
+        
+        public Pet() {}
+        
+        public Pet(ILazyLoader lazyLoader)
+        {
+            LazyLoader = lazyLoader;
+        }
+        
+        private ILazyLoader LazyLoader;
+
+        // All the properties visible to EF Core:
         public int Id { get; set; }
-        
-        // What EF needs (a mapping to concrete classes in the same collection of entities.)
+        public string Name { get; set; }
+        public string Morph { get; set; }
+        public DateTime? HatchDate { get; set; }
+        public User RealCareTaker { get; set; }
         public Species RealSpecies { get; set; }
+        public Environment RealEnclosure { get; set; }
+        public BlobRecord ProfileRecordEntity { get; set; }
+        public EnvDataSample? LatestConcreteSample
+        {
+            get => LazyLoader?.Load(this, ref _latestConcreteSample) ?? _latestConcreteSample;
+            set => _latestConcreteSample = value;
+        }
         
-        // what Core needs, but EF can't see.
+        // Abstraction compliance, fulfill the Core interface.
         [NotMapped]
         public ISpecies Species 
         { 
@@ -23,29 +45,13 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
                 if (value is Species species) RealSpecies = species;
             } 
         }
-
-        public User RealCareTaker { get; set; }
-        
-        [NotMapped]
-        public IUser CareTaker => RealCareTaker;
-
-        public Environment RealEnclosure { get; set; }
-
-        [NotMapped] 
-        public IEnvironment? Enclosure => RealEnclosure;
-
-        // Concrete
-        public BlobRecord ProfileRecordEntity { get; set; }
-
-        // abstract
-        [NotMapped] 
-        public IBlobRecord? ProfileImage => ProfileRecordEntity;
+        [NotMapped] public IUser CareTaker => RealCareTaker;
+        [NotMapped] public IEnvironment? Enclosure => RealEnclosure;
+        [NotMapped] public IBlobRecord? ProfileImage => ProfileRecordEntity;
 
         // TODO: maintain a many-to-many with past profile pictures?
         //  may be worthwhile even if just for record keeping.
         
-        public string Name { get; set; }
-        public string Morph { get; set; }
-        public DateTime? HatchDate { get; set; }
+        [NotMapped] public IEnvDataSample? LatestSample => LatestConcreteSample;
     }
 }

@@ -76,5 +76,14 @@ namespace Viv2.API.Core.Adapters
         /// <param name="imageRecord"></param>
         /// <returns></returns>
         public Task UpdateImage([NotNull] IPet pet, [NotNull] IBlobRecord imageRecord);
+
+        /// <summary>
+        /// Sets the given sample as the pet's most recent sample taken. This helps avoid
+        /// the overhead of scanning large tables for the maximum date value.
+        /// </summary>
+        /// <param name="pet"></param>
+        /// <param name="sample"></param>
+        /// <returns></returns>
+        public Task UpdateLatestSample([NotNull] IPet pet, [NotNull] IEnvDataSample sample);
     }
 }

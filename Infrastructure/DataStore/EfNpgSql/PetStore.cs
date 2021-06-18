@@ -47,9 +47,8 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
         public async Task<ISpecies> LoadSpecies([NotNull] IPet pet, bool force = false)
         {
             if (!force && pet.Species != null) return pet.Species;
-            
-            var concrete = pet as Pet;
-            if (concrete == null) throw new ArgumentException("Mismatched infrastructure components");
+
+            if (!(pet is Pet concrete)) throw new ArgumentException("Mismatched infrastructure components");
 
             await _context.Entry(concrete).Reference(p => p.RealSpecies).LoadAsync();
             
@@ -59,9 +58,8 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
         public async Task<IUser> LoadCareTaker([NotNull] IPet pet, bool force = false)
         {
             if (!force && pet.CareTaker != null) return pet.CareTaker;
-            
-            var concrete = pet as Pet;
-            if (concrete == null) throw new ArgumentException("Mismatched infrastructure components");
+
+            if (!(pet is Pet concrete)) throw new ArgumentException("Mismatched infrastructure components");
 
             await _context.Entry(concrete).Reference(p => p.RealCareTaker).LoadAsync();
             
@@ -72,8 +70,7 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
         {
             if (!force && pet.ProfileImage != null) return pet.ProfileImage;
 
-            var concrete = pet as Pet;
-            if (concrete == null) throw new ArgumentException("Mismatched infrastructure components");
+            if (!(pet is Pet concrete)) throw new ArgumentException("Mismatched infrastructure components");
 
             await _context.Entry(concrete).Reference(p => p.ProfileRecordEntity).LoadAsync();
             return pet.ProfileImage;
@@ -82,11 +79,9 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
         public async Task MigratePet([NotNull] IPet pet, IEnvironment environment)
         {
             var oldEnv = pet.Enclosure as Environment;
-
-            var concretePet = pet as Pet;
             var concreteEnv = environment as Environment;
             
-            if (concretePet == null) throw new ArgumentException("Mismatched infrastructure components");
+            if (!(pet is Pet concretePet)) throw new ArgumentException("Mismatched infrastructure components");
             
             // Disassociate from pet. (TODO: correct when relationship changes to many pets per environment.)
             if (oldEnv != null) oldEnv.Inhabitant = null;
@@ -99,13 +94,21 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
 
         public async Task UpdateImage([NotNull] IPet pet, [NotNull] IBlobRecord imageRecord)
         {
-            var concretePet = pet as Pet;
-            var concreteRecord = imageRecord as BlobRecord;
-            
-            if (concretePet == null || concreteRecord == null) 
+            if (!(pet is Pet concretePet) || !(imageRecord is BlobRecord concreteRecord)) 
                 throw new ArgumentException("Mismatched infrastructure components");
 
             concretePet.ProfileRecordEntity = concreteRecord;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateLatestSample(IPet pet, IEnvDataSample sample)
+        {
+            if (!(pet is Pet concretePet) || !(sample is EnvDataSample concreteSample))
+                throw new ArgumentException("Mismatched infrastructure types");
+
+            concretePet.LatestConcreteSample = concreteSample;
+            // TODO: confirm pet is being tracked by context
+            
             await _context.SaveChangesAsync();
         }
     }

@@ -16,11 +16,18 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
             Samples = new HashSet<EnvDataSample>();
             BackedUsers = new HashSet<User>();
         }
-        
+     
+        // Properties discoverable by EF Core that utilize concrete classes to define relations.
         public Guid? Id { get; set; }
-        
         public Controller? RealController { get; set; }
-        
+        public Pet? RealInhabitant { get; set; }
+        public string? Model { get; set; }
+        public string? Descr { get; set; }
+        public ICollection<EnvDataSample> Samples { get; set; }
+        public virtual ICollection<User> BackedUsers { get; set; }
+
+        // All the hidden abstraction implementations (fulfillment of the Core interface that don't play
+        // too nicely with EF Core.) 
         [NotMapped]
         public IController? Controller
         {
@@ -32,16 +39,6 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
             }
         }
         
-        // what EF needs
-        public Pet? RealInhabitant { get; set; }
-        
-        /// <summary>
-        /// Used as the dependent relation on the current
-        /// one-to-one relationship between pets and enclosures. 
-        /// </summary>
-        public int? InhabitantId { get; set; }
-        
-        // What Core needs
         [NotMapped]
         public IPet? Inhabitant 
         { 
@@ -57,17 +54,8 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
             } 
         }
         
-        public string? Model { get; set; }
-        public string? Descr { get; set; }
-        
-        public ICollection<EnvDataSample> Samples { get; set; }
-        
-        // For abstraction compliance (what Core accesses)
         [NotMapped]
         public ICollection<IEnvDataSample> EnvDataSamples => Samples.Select(s => s as IEnvDataSample).ToList();
-        
-        // For interfacing with entities (What EF needs)
-        public virtual ICollection<User> BackedUsers { get; set; }
         
         // For abstraction compliance (what Core accesses)
         [NotMapped] 

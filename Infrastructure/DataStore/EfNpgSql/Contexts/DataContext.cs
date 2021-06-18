@@ -48,14 +48,28 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts
                 .Ignore(e => e.Controller)
                 .Ignore(e => e.Inhabitant)
                 .Ignore(e => e.EnvDataSamples)
-                .Ignore(e => e.Users)
+                .Ignore(e => e.Users);
+                
+            // Add a shadow property for specifying the dependent side of the
+            // 1 to 1 and configure it to be a foreign key
+            modelBuilder.Entity<Environment>()
+                .Property<int?>("InhabitantId");
+            modelBuilder.Entity<Environment>()
                 .HasOne<Pet>(e => e.RealInhabitant)
                 .WithOne(p => p.RealEnclosure)
-                .HasForeignKey<Environment>(e => e.InhabitantId);
+                .HasForeignKey<Environment>("InhabitantId");
 
             modelBuilder.Entity<Pet>()
                 .Ignore(p => p.Species)
-                .Ignore(p => p.CareTaker); 
+                .Ignore(p => p.CareTaker);
+            
+            // Configure the dependent side of a 1to1 using a shadow foreign key.
+            modelBuilder.Entity<Pet>()
+                .Property<long?>("LatestSampleId");
+            modelBuilder.Entity<Pet>()
+                .HasOne(p => p.LatestConcreteSample)
+                .WithOne()
+                .HasForeignKey<Pet>("LatestSampleId");
 
             modelBuilder.Entity<Species>()
                 .Ignore(s => s.Pets);
@@ -70,6 +84,11 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Contexts
                 .Property(e => e.Captured)
                 .HasDefaultValueSql("(NOW() AT TIME ZONE 'utc')");
             
+            // Set EF Core to utilize EnvDataSample's Captured property setter when materializing the entity
+            modelBuilder.Entity<EnvDataSample>()
+                .Property(eds => eds.Captured)
+                .UsePropertyAccessMode(PropertyAccessMode.Property);
+
             // Ensure navigation property EnvDataSample.Occupant, which may not be caught implicitly.
             //modelBuilder.Entity<EnvDataSample>()
             //    .HasOne(eds => eds.Occupant);
