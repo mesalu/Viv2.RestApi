@@ -3,6 +3,8 @@ using System.Diagnostics.CodeAnalysis;
 using Viv2.API.Core.ProtoEntities;
 using Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities;
 
+#nullable enable
+
 namespace Viv2.API.AppInterface.Dto
 {
     /// <summary>
@@ -19,15 +21,17 @@ namespace Viv2.API.AppInterface.Dto
                 Morph = pet.Morph,
                 HatchDate = pet.HatchDate,
                 Species = (pet.Species != null) ? SpeciesDto.From(pet.Species) : null,
-                CareTakerId = pet.CareTaker.Guid
+                CareTakerId = pet.CareTaker.Guid,
+                LatestSample = (pet.LatestSample != null) ? SampleDto.From(pet.LatestSample) : null
             };
         }
         
         public int Id { get; set; }
-        public string Name { get; init; }
-        public string Morph { get; init; }
+        public string? Name { get; init; }
+        public string? Morph { get; init; }
         public DateTime? HatchDate { get; init; }
-        public SpeciesDto Species { get; init; }
+        public SpeciesDto? Species { get; init; }
         public Guid CareTakerId { get; init; }
+        public SampleDto? LatestSample { get; init; }
     }
 }

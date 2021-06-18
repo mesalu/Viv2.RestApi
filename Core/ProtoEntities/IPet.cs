@@ -14,5 +14,6 @@ namespace Viv2.API.Core.ProtoEntities
         public string Morph { get; }
         public DateTime? HatchDate { get; }
         public IBlobRecord? ProfileImage { get; }
+        public IEnvDataSample? LatestSample { get; }
     }
 }

@@ -13,17 +13,15 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql.Entities
         {
             BackedPets = new HashSet<Pet>();
         }
-        
+        // Concrete class properties that EF uses for relations:
         public int Id { get; set; }
         public string Name { get; set; }
         public string ScientificName { get; set; }
         public double DefaultLatitude { get; set; }
         public double DefaultLongitude { get; set; }
-
-        // For interfacing with entities (what EF needs)
-        public virtual ICollection<Pet> BackedPets { get; set; }
+        public ICollection<Pet> BackedPets { get; set; }
         
-        // For compliance with abstraction (what Core accesses)
+        // Abstraction fulfillment:
         [NotMapped]
         public ICollection<IPet> Pets => BackedPets.Select(bp => bp as IPet).ToImmutableList();
     }

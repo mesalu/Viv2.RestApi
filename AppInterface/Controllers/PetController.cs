@@ -94,61 +94,46 @@ namespace Viv2.API.AppInterface.Controllers
             
             return (pet != null) ? new OkObjectResult(PetDto.From(pet)) : BadRequest();
         }
-
+        
         /// <summary>
-        /// Loads preliminary data to display for the specified pet.
-        /// The content of the data set is specified by <see cref="PreliminaryPetData"/>
+        /// Fetches the env samples that are associated to the specified pet by ID
+        /// within the range [start, end)
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">The Pet ID whose samples are being fetched</param>
+        /// <param name="start">start of the capture time range, inclusive</param>
+        /// <param name="end">end of the capture time range, exclusive</param>
         /// <returns></returns>
-        [HttpGet("{id}/prelim")]
-        public async Task<IActionResult> GetPreliminaryDataFor(int id)
+        [HttpGet("{id}/samples")]
+        public async Task<IActionResult> GetSamplesPage(int id, DateTime start, DateTime end)
         {
-            var userId = _claimsCompat.ExtractFirstIdClaim(HttpContext.User);
-            
-            // Fetch the pet specified by ID
-            var petRequest = new DataAccessRequest<IPet>
-            {
-                UserId = userId,
-                Strategy = DataAccessRequest<IPet>.AcquisitionStrategy.Single,
-                SelectionPredicate = (pet => pet.Id == id)
-            };
-            var petPort = new BasicPresenter<GenericDataResponse<IPet>>();
-            var success = await _getPetDataUseCase.Handle(petRequest, petPort);
+            if (start.Equals(DateTime.MinValue) || end.Equals(DateTime.MinValue)) return BadRequest(ModelState);
 
-            if (!success) return BadRequest();
-
-            // Fetch samples for the pet
-            var sampleRequest = new DataAccessRequest<IEnvDataSample>
+            if (end < start)
             {
-                UserId = userId,
+                var tmp = start;
+                start = end;
+                end = tmp;
+            }
+
+            var request = new DataAccessRequest<IEnvDataSample>()
+            {
+                UserId = _claimsCompat.ExtractFirstIdClaim(HttpContext.User),
                 Strategy = DataAccessRequest<IEnvDataSample>.AcquisitionStrategy.Range,
-                SelectionPredicate = (sample => sample.Occupant?.Id == id)
+                SelectionPredicate = sample =>
+                {
+                    var captureTime = sample.Captured;
+                    var gteStart = start <= captureTime;
+                    var ltEnd = captureTime < end;
+                    var matchingPet = sample.Occupant?.Id == id;
+                    return matchingPet && gteStart && ltEnd;
+                }
             };
-            var samplePort = new BasicPresenter<GenericDataResponse<IEnvDataSample>>();
-            success = await _sampleDataUseCase.Handle(sampleRequest, samplePort);
+
+            var port = new BasicPresenter<GenericDataResponse<IEnvDataSample>>();
+            var success = await _sampleDataUseCase.Handle(request, port);
 
             if (!success) return BadRequest();
-
-            var latestSample = (samplePort.Response.Result.Count > 0)
-                ? SampleDto.From(
-                    samplePort.Response.Result
-                        .Aggregate((agg, cur) =>
-                            (agg.Captured ?? DateTime.MinValue) > (cur.Captured ?? DateTime.MinValue) ? agg : cur
-                        ))
-                : null;
-            
-            // compose final DTO
-            var dto = new PreliminaryPetData
-            {
-                Pet = PetDto.From(petPort.Response.Result.First()),
-                
-                // NOTE: while this is (nearly) a one-liner, it causes frequent re-evaluation of .Captured
-                // properties, which is unideal.
-                LatestSample = latestSample
-            };
-
-            return new OkObjectResult(dto);
+            return new OkObjectResult(port.Response.Result.Select(SampleDto.From));
         }
         
         /// <summary>
@@ -210,7 +195,7 @@ namespace Viv2.API.AppInterface.Controllers
             // Ensure content type is supported 
             // TODO: look at applying some sort of 'upstream' filter on this instead of checking here.
             //       (it'll probably help with preflight requests and the like)
-            var supportedMimeTypes = new string[] {"image/png", "image/jpeg"};
+            var supportedMimeTypes = new [] {"image/png", "image/jpeg"};
             if (!supportedMimeTypes.Any(x => x.Equals(Request.ContentType))) 
                 return new UnsupportedMediaTypeResult();
             
@@ -250,47 +235,6 @@ namespace Viv2.API.AppInterface.Controllers
 
             var success = await _imageUseCase.Handle(request, port);
             return (success) ? new RedirectResult(port.Response.Uri.ToString()) : NotFound();
-        }
-
-        /// <summary>
-        /// Fetches the env samples that are associated to the specified pet by ID
-        /// within the range [start, end)
-        /// </summary>
-        /// <param name="id">The Pet ID whose samples are being fetched</param>
-        /// <param name="start">start of the capture time range, inclusive</param>
-        /// <param name="end">end of the capture time range, exclusive</param>
-        /// <returns></returns>
-        [HttpGet("{id}/samples")]
-        public async Task<IActionResult> GetSamplesPage(int id, DateTime start, DateTime end)
-        {
-            if (start.Equals(DateTime.MinValue) || end.Equals(DateTime.MinValue)) return BadRequest(ModelState);
-
-            if (end < start)
-            {
-                var tmp = start;
-                start = end;
-                end = tmp;
-            }
-            
-            var request = new DataAccessRequest<IEnvDataSample>()
-            {
-                UserId = _claimsCompat.ExtractFirstIdClaim(HttpContext.User),
-                Strategy = DataAccessRequest<IEnvDataSample>.AcquisitionStrategy.Range,
-                SelectionPredicate = sample =>
-                {
-                    var captureTime = sample.Captured;
-                    var gteStart = start <= captureTime;
-                    var ltEnd = captureTime < end;
-                    var matchingPet = sample.Occupant?.Id == id;
-                    return matchingPet && gteStart && ltEnd;
-                }
-            };
-
-            var port = new BasicPresenter<GenericDataResponse<IEnvDataSample>>();
-            var success = await _sampleDataUseCase.Handle(request, port);
-
-            if (!success) return BadRequest();
-            return new OkObjectResult(port.Response.Result.Select(SampleDto.From));
         }
     }
 }

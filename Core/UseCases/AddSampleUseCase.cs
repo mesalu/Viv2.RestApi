@@ -15,12 +15,14 @@ namespace Viv2.API.Core.UseCases
         private readonly IUserStore _userStore;
         private readonly IEnvironmentStore _envStore;
         private readonly IEntityFactory _entityFactory;
+        private readonly IPetStore _petStore;
         
-        public AddSampleUseCase(IUserStore userStore, IEnvironmentStore envStore,
+        public AddSampleUseCase(IUserStore userStore, IEnvironmentStore envStore, IPetStore petStore,
             IEntityFactory entityFactory)
         {
             _userStore = userStore;
             _envStore = envStore;
+            _petStore = petStore;
             _entityFactory = entityFactory;
         }
         
@@ -48,6 +50,10 @@ namespace Viv2.API.Core.UseCases
                 .Build();
 
             await _envStore.AddSample(sample);
+
+            if (sample.Occupant != null)
+                await _petStore.UpdateLatestSample(sample.Occupant, sample);
+            
             return true;
         }
     }
