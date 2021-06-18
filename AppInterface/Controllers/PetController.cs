@@ -24,14 +24,14 @@ namespace Viv2.API.AppInterface.Controllers
         private readonly IClaimIdentityCompat _claimsCompat;
         private readonly IAddPetUseCase _addPetUseCase;
         private readonly IGetPetDataUseCase _getPetDataUseCase;
-        private readonly IGetSamplesUseCase _sampleDataUseCase;
+        private readonly ISampleAcquisitionUseCase _sampleDataUseCase;
         private readonly IMigratePetUseCase _migratePetUseCase;
         private readonly IPetImageUseCase _imageUseCase;
         
         public PetController(IClaimIdentityCompat claimIdentityCompat,
             IAddPetUseCase addPetUseCase,
             IGetPetDataUseCase getPetDataUseCase,
-            IGetSamplesUseCase getSamplesUseCase,
+            ISampleAcquisitionUseCase getSamplesUseCase,
             IMigratePetUseCase migratePetUseCase,
             IPetImageUseCase imageUseCase)
         {
@@ -114,19 +114,15 @@ namespace Viv2.API.AppInterface.Controllers
                 end = tmp;
             }
 
-            var request = new DataAccessRequest<IEnvDataSample>()
+            var request = new SampleAccessRequest()
             {
+                Selector = SampleAccessRequest.SelectionCriteria.Pet,
                 UserId = _claimsCompat.ExtractFirstIdClaim(HttpContext.User),
-                Strategy = DataAccessRequest<IEnvDataSample>.AcquisitionStrategy.Range,
-                SelectionPredicate = sample =>
-                {
-                    var captureTime = sample.Captured;
-                    var gteStart = start <= captureTime;
-                    var ltEnd = captureTime < end;
-                    var matchingPet = sample.Occupant?.Id == id;
-                    return matchingPet && gteStart && ltEnd;
-                }
+                PetId = id,
+                RangeStart = start,
+                RangeEnd = end
             };
+            
 
             var port = new BasicPresenter<GenericDataResponse<IEnvDataSample>>();
             var success = await _sampleDataUseCase.Handle(request, port);

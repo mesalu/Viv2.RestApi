@@ -35,9 +35,9 @@ namespace Viv2.API.Infrastructure.ServiceManagement
             switch (type)
             {
                 case TokenMinterTypes.JWS:
-                    MinterOptions options = new MinterOptions();
+                    var options = new MinterOptions();
                     configuration.Bind("MinterOptions", options);
-                    JwsMinter minter = new JwsMinter(options);
+                    var minter = new JwsMinter(options);
                     services.AddSingleton<ITokenMinter>(minter);
                     _ConfigureForJwtAuth(services, configuration, minter.ValidationParameters, options);
                     break;
@@ -72,6 +72,7 @@ namespace Viv2.API.Infrastructure.ServiceManagement
             services.AddScoped<IPetStore, PetStore>();
             services.AddScoped<IEnvironmentStore, EnvironmentStore>();
             services.AddScoped<IControllerStore, ControllerStore>();
+            services.AddScoped<ISampleStore, SampleStore>();
 
             services.AddIdentity<User, IdentityRole>(options =>
                 {

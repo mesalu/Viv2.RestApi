@@ -31,6 +31,7 @@ namespace Viv2.API.Core.UseCases
             services.AddTransient<IBlobAccessUseCase, BlobAccessUseCase>();
             services.AddTransient<IPetImageUseCase, PetImageUseCase>();
             services.AddTransient<IPetImageUseCase, PetImageUseCase>();
+            services.AddTransient<ISampleAcquisitionUseCase, SampleAcquisitionUseCase>();
         }
     }
 }
