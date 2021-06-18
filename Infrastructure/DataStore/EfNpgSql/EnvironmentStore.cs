@@ -60,9 +60,8 @@ namespace Viv2.API.Infrastructure.DataStore.EfNpgSql
             // of checking for null-ness, we should check for contents.
             // TODO: double check logic for 'legitimately empty' scenarios.
             if (env.EnvDataSamples.Count > 0 && !force) return env.EnvDataSamples;
-            
-            var concrete = env as Environment;
 
+            var concrete = env as Environment;
             if (concrete == null) throw new ArgumentException("Mismatched datastore implementations");
             await _context.Entry(concrete).Collection(e => e.Samples).LoadAsync();
             return env.EnvDataSamples;
