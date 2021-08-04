@@ -35,6 +35,34 @@ namespace Viv2.API.AppInterface
             services.AddRelationalDataStore(BackingStoreTypes.EfIdent, Configuration);
             services.AddTokenAuth(TokenMinterTypes.JWS, Configuration);
             services.AddBlobDataStore(Configuration);
+            
+            // Configure CORS policies (depending on mode)
+#if DEBUG
+            services.AddCors(options =>
+            {
+                options.AddPolicy("LocalHost3000",
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:3000")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials();
+                    });
+            });
+#else
+            services.AddCors(options =>
+            {
+                options.AddPolicy("BlobStorageStaticSite",
+                    builder =>
+                    {
+                        builder.WithOrigins("TBD")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .SetIsOriginAllowedToAllowWildcardSubdomains();
+                    });
+            });
+#endif
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,6 +72,12 @@ namespace Viv2.API.AppInterface
                 app.UseDeveloperExceptionPage();
             
             app.UseRequestLogging();
+#if DEBUG
+            app.UseCors("LocalHost3000");
+#else
+            app.UseCors("BlobStorageStaticSite");
+#endif  
+            
             app.UseHttpsRedirection();
 
             app.UseRouting();
